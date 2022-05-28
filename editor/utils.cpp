@@ -1,5 +1,6 @@
 #include "utils.h"
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <Windows.h>
 #include <WinUser.h>
@@ -40,4 +41,10 @@ void getConsoleSize(int* width, int* height) {
 	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
 	*width = info.srWindow.Right - info.srWindow.Left + 1;
 	*height = info.srWindow.Bottom - info.srWindow.Top + 1;
+}
+
+bool checkFileExists(const std::string& str)
+{
+	std::ifstream ifs(str);
+	return ifs.is_open();
 }

@@ -17,7 +17,7 @@ Code::Code()
 	this->x = 0;
 	this->y = 0;
 	this->_x = 0;
-	this->charCounts = { 0 };
+	//this->charCounts = { 0 };
 
 	this->top = 0;
 }
@@ -34,7 +34,8 @@ vector<string> Code::getText()
 
 vector<int> Code::getViewSize()
 {
-	int width = *max_element(this->charCounts.begin(), this->charCounts.end());
+	//int width = *max_element(this->charCounts.begin(), this->charCounts.end());
+	int width = 0;
 	int height = this->text.size();
 
 	return vector<int>{width, height};
@@ -120,6 +121,17 @@ void Code::renderCode(string keyEvent)
 		}
 		else {
 			this->pressBack();
+			this->renderOneLineCode();
+		}
+	}
+	else if (keyEvent == "<[delete]>") {
+		if (this->x == this->text[this->y].length()) {
+			this->pressDelete();
+			this->scrollView();
+			this->renderViewCode();
+		}
+		else {
+			this->pressDelete();
 			this->renderOneLineCode();
 		}
 	}
@@ -277,7 +289,7 @@ void Code::insertString(string content)
 	}
 	this->poolXPosition();
 
-	this->charCounts[this->y] = this->text[this->y].length();
+	//this->charCounts[this->y] = this->text[this->y].length();
 }
 
 void Code::pressEnter()
@@ -287,14 +299,14 @@ void Code::pressEnter()
 		this->y++;
 		this->x = 0;
 
-		this->charCounts.insert(this->charCounts.begin() + this->y - 1, 0);
+		//this->charCounts.insert(this->charCounts.begin() + this->y - 1, 0);
 	}
 	else if (this->x == this->text[this->y].length()) {
 		this->y++;
 		this->text.insert(this->text.begin() + this->y, "");
 		this->x = 0;
 
-		this->charCounts.insert(this->charCounts.begin() + this->y, 0);
+		//this->charCounts.insert(this->charCounts.begin() + this->y, 0);
 	}
 	else {
 		string substr = this->text[this->y].substr(this->x);
@@ -303,8 +315,8 @@ void Code::pressEnter()
 		this->text.insert(this->text.begin() + this->y, substr);
 		this->x = 0;
 
-		this->charCounts[this->y - 1] = this->text[this->y - 1].length();
-		this->charCounts.insert(this->charCounts.begin() + this->y, substr.length());
+		//this->charCounts[this->y - 1] = this->text[this->y - 1].length();
+		//this->charCounts.insert(this->charCounts.begin() + this->y, substr.length());
 	}
 	this->poolXPosition();
 }
@@ -318,8 +330,8 @@ void Code::pressBack()
 			this->text.erase(this->text.begin() + this->y, this->text.begin() + this->y + 1);
 			this->y--;
 			
-			this->charCounts[this->y] = this->text[this->y].length();
-			this->charCounts.erase(this->charCounts.begin() + this->y + 1, this->charCounts.begin() + this->y + 2);
+			//this->charCounts[this->y] = this->text[this->y].length();
+			//this->charCounts.erase(this->charCounts.begin() + this->y + 1, this->charCounts.begin() + this->y + 2);
 		}
 	}
 	else {
@@ -336,13 +348,22 @@ void Code::pressBack()
 			this->x--;
 		}
 
-		this->charCounts[this->y] = this->text[this->y].length();
+		//this->charCounts[this->y] = this->text[this->y].length();
 	}
 	this->poolXPosition();
 }
 
 void Code::pressDelete()
 {
+	if (this->x == this->text[this->y].length()) {
+		if (this->y != this->text.size() - 1) {
+			this->text[this->y] += this->text[this->y + 1];
+			this->text.erase(this->text.begin() + this->y + 1, this->text.begin() + this->y + 2);
+		}
+	}
+	else {
+		this->text[this->y].erase(this->text[this->y].begin() + this->x, this->text[this->y].begin() + this->x + 1);
+	}
 }
 
 void Code::pressTab()

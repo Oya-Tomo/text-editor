@@ -24,7 +24,7 @@ private:
 	int x;
 	int y;
 	int _x; // pool cursor x positon when you move cursor to right or left.
-	vector<int> charCounts;
+	//vector<int> charCounts;
 
 	int top;
 	void renderScrollUpView(int diff);
