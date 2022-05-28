@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="editor.cpp" />
+    <ClCompile Include="key.cpp">
+      <Filter>key</Filter>
+    </ClCompile>
+    <ClCompile Include="code.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
+    <ClCompile Include="core.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="key">
+      <UniqueIdentifier>{235d9ba2-5d83-40d2-8122-73ae83c06a55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code">
+      <UniqueIdentifier>{a25035fb-62e5-4ade-af31-f80e12c39e70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core">
+      <UniqueIdentifier>{f2508be0-c762-4c80-95f5-c7fef303d049}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utils">
+      <UniqueIdentifier>{adf3b938-ae37-436b-8e0e-ea71b8c86657}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="key.h">
+      <Filter>key</Filter>
+    </ClInclude>
+    <ClInclude Include="code.h">
+      <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="core.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
