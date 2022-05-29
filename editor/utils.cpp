@@ -48,3 +48,33 @@ bool checkFileExists(const std::string& str)
 	std::ifstream ifs(str);
 	return ifs.is_open();
 }
+
+std::string UTF8toSjis(std::string srcUTF8)
+{
+	int lenghtUnicode = MultiByteToWideChar(CP_UTF8, 0, srcUTF8.c_str(), srcUTF8.size() + 1, NULL, 0);
+	wchar_t* bufUnicode = new wchar_t[lenghtUnicode];
+	MultiByteToWideChar(CP_UTF8, 0, srcUTF8.c_str(), srcUTF8.size() + 1, bufUnicode, lenghtUnicode);
+	int lengthSJis = WideCharToMultiByte(CP_THREAD_ACP, 0, bufUnicode, -1, NULL, 0, NULL, NULL);
+
+	char* bufShiftJis = new char[lengthSJis];
+	WideCharToMultiByte(CP_THREAD_ACP, 0, bufUnicode, lenghtUnicode + 1, bufShiftJis, lengthSJis, NULL, NULL);
+
+	std::string strSJis(bufShiftJis);
+
+	return strSJis;
+}
+
+std::string SjistoUTF8(std::string srcSjis)
+{
+	int lenghtUnicode = MultiByteToWideChar(CP_THREAD_ACP, 0, srcSjis.c_str(), srcSjis.size() + 1, NULL, 0);
+	wchar_t* bufUnicode = new wchar_t[lenghtUnicode];
+	MultiByteToWideChar(CP_THREAD_ACP, 0, srcSjis.c_str(), srcSjis.size() + 1, bufUnicode, lenghtUnicode);
+	int lengthUTF8 = WideCharToMultiByte(CP_UTF8, 0, bufUnicode, -1, NULL, 0, NULL, NULL);
+
+	char* bufUTF8 = new char[lengthUTF8];
+	WideCharToMultiByte(CP_UTF8, 0, bufUnicode, lenghtUnicode - 1, bufUTF8, lengthUTF8, NULL, NULL);
+
+	std::string strUTF8(bufUTF8);
+
+	return strUTF8;
+}

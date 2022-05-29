@@ -362,7 +362,12 @@ void Code::pressDelete()
 		}
 	}
 	else {
-		this->text[this->y].erase(this->text[this->y].begin() + this->x, this->text[this->y].begin() + this->x + 1);
+		if ((bool)IsDBCSLeadByte(this->text[this->y][this->x]) == 1) {
+			this->text[this->y].erase(this->text[this->y].begin() + this->x, this->text[this->y].begin() + this->x + 2);
+		}
+		else {
+			this->text[this->y].erase(this->text[this->y].begin() + this->x, this->text[this->y].begin() + this->x + 1);
+		}
 	}
 }
 

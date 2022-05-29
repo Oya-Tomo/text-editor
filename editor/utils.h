@@ -15,4 +15,7 @@ void getConsoleSize(int* width, int* height);
 
 bool checkFileExists(const std::string& str);
 
+string UTF8toSjis(string srcUTF8);
+string SjistoUTF8(string srcSjis);
+
 #endif // !UTILS_H
