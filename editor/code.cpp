@@ -8,6 +8,7 @@
 #include <regex>
 #include "code.h"
 #include "utils.h"
+#include "color.h"
 
 using namespace std;
 
@@ -18,6 +19,7 @@ Code::Code()
 	this->y = 0;
 	this->_x = 0;
 	//this->charCounts = { 0 };
+	this->colorMode = NORMAL_MODE;
 
 	this->top = 0;
 }
@@ -30,6 +32,11 @@ void Code::setText(string content)
 vector<string> Code::getText()
 {
 	return this->text;
+}
+
+void Code::setColorMode(int mode)
+{
+	this->colorMode = mode;
 }
 
 vector<int> Code::getViewSize()
@@ -53,7 +60,8 @@ void Code::renderViewCode()
 	if (this->top + height <= this->text.size()) {
 		for (int i = 0; i < height; i++) {
 			//std::cout << this->text[i + this->top];
-			std::cout << std::regex_replace(this->text[i + this->top], std::regex("(</?!?)([a-z]*[A-Z]*[0-9]*)([^>]*)(>)"), "$1\033[34m$2\033[33m$3\033[m$4");
+			//std::cout << std::regex_replace(this->text[i + this->top], std::regex("(</?!?)([a-z]*[A-Z]*[0-9]*)([^>]*)(>)"), "$1\033[34m$2\033[33m$3\033[m$4");
+			std::cout << coloringText(this->text[i + this->top], this->colorMode);
 			if (i != height - 1) {
 				std::cout << "\n";
 			}
@@ -63,7 +71,8 @@ void Code::renderViewCode()
 		int lines = this->text.size() - this->top;
 		for (int i = 0; i < lines; i++) {
 			//std::cout << this->text[i + this->top];
-			std::cout << std::regex_replace(this->text[i + this->top], std::regex("(</?!?)([a-z]*[A-Z]*[0-9]*)([^>]*)(>)"), "$1\033[34m$2\033[33m$3\033[m$4");
+			//std::cout << std::regex_replace(this->text[i + this->top], std::regex("(</?!?)([a-z]*[A-Z]*[0-9]*)([^>]*)(>)"), "$1\033[34m$2\033[33m$3\033[m$4");
+			std::cout << coloringText(this->text[i + this->top], this->colorMode);
 			if (i != lines - 1) {
 				std::cout << "\n";
 			}
@@ -79,7 +88,9 @@ void Code::renderOneLineCode()
 	std::cout << "\x1b[" << this->y - this->top + 1 << ";0H";
 	std::cout << "\x1b[2K";
 	//std::cout << this->text[this->y];
-	std::cout << std::regex_replace(this->text[this->y], std::regex("(</?!?)([a-z]*[A-Z]*[0-9]*)([^>]*)(>)"), "$1\033[34m$2\033[33m$3\033[m$4");
+	//std::cout << std::regex_replace(this->text[this->y], std::regex("(</?!?)([a-z]*[A-Z]*[0-9]*)([^>]*)(>)"), "$1\033[34m$2\033[33m$3\033[m$4");
+	std::cout << coloringText(this->text[this->y], this->colorMode);
+
 	std::cout << "\x1b[?25h";
 }
 
@@ -136,8 +147,23 @@ void Code::renderCode(string keyEvent)
 		}
 	}
 	else {
-		this->insertString(keyEvent);
-		this->renderOneLineCode();
+		vector<string> lines = split(keyEvent, "\r");
+
+		if (lines.size() == 1) {
+			this->insertString(keyEvent);
+			this->renderOneLineCode();
+		}
+		else {
+
+			for (int i = 0; i < lines.size(); i++) {
+				this->insertString(lines[i]);
+				if (i != i - 1) {
+					this->pressEnter();
+				}
+			}
+			this->scrollView();
+			this->renderViewCode();
+		}
 	}
 	this->setRelativeCursorPos();
 }
@@ -149,7 +175,8 @@ void Code::renderScrollUpView(int diff)
 	std::cout << "\x1b[" << diff << "T";
 	for (int i = 0; i < diff; i++) {
 		std::cout << "\x1b[" << i + 1 << ";1H";
-		std::cout << this->text[this->top + i];
+		//std::cout << this->text[this->top + i];
+		std::cout << coloringText(this->text[this->top + i], this->colorMode);
 	}
 	
 	std::cout << "\x1b[?25h";
@@ -165,7 +192,8 @@ void Code::renderScrollDownView(int diff)
 	std::cout << "\x1b[" << diff << "S";
 	for (int i = 0; i < diff; i++) {
 		std::cout << "\x1b[" << height - i << ";1H";
-		std::cout << this->text[this->top + height - 1 - i];
+		//std::cout << this->text[this->top + height - 1 - i];
+		std::cout << coloringText(this->text[this->top + height - 1 - i], this->colorMode);
 	}
 	
 	std::cout << "\x1b[?25h";

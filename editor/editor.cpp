@@ -4,6 +4,7 @@
 #include <Shlwapi.h>
 
 #include "code.h"
+#include "color.h"
 #include "core.h"
 #include "key.h"
 #include "utils.h"
@@ -28,6 +29,7 @@ int main(int argc, char *argv[])
 
 	Core core = Core(filename);
 	Code code = Code();
+	code.setColorMode(HTML_MODE);
 	code.setText(core.open());
 	code.renderViewCode();
 
@@ -44,6 +46,18 @@ int main(int argc, char *argv[])
 				}
 			}
 			core.save(content);
+		}
+		else if (keyEvent == "<[ctrl-q]>") {
+			vector<string> text = code.getText();
+			string content = "";
+			for (int i = 0; i < text.size(); i++) {
+				content += text[i];
+				if (i != text.size() - 1) {
+					content += "\n";
+				}
+			}
+			core.save(content);
+			exit(0);
 		}
 		else {
 			code.renderCode(keyEvent);

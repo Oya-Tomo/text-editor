@@ -14,6 +14,9 @@
     <ClCompile Include="utils.cpp">
       <Filter>utils</Filter>
     </ClCompile>
+    <ClCompile Include="color.cpp">
+      <Filter>color</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="key">
@@ -28,6 +31,9 @@
     <Filter Include="utils">
       <UniqueIdentifier>{adf3b938-ae37-436b-8e0e-ea71b8c86657}</UniqueIdentifier>
     </Filter>
+    <Filter Include="color">
+      <UniqueIdentifier>{f42e12bc-520e-4a54-9ad8-582fa4f199c0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="key.h">
@@ -41,6 +47,9 @@
     </ClInclude>
     <ClInclude Include="utils.h">
       <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="color.h">
+      <Filter>color</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

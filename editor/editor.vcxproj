@@ -141,6 +141,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="code.cpp" />
+    <ClCompile Include="color.cpp" />
     <ClCompile Include="core.cpp" />
     <ClCompile Include="editor.cpp" />
     <ClCompile Include="key.cpp" />
@@ -148,6 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code.h" />
+    <ClInclude Include="color.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="key.h" />
     <ClInclude Include="utils.h" />

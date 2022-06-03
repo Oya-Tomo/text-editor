@@ -19,12 +19,16 @@ public:
 	void renderViewCode();
 	void renderOneLineCode();
 
+	void setColorMode(int mode);
+
 private:
 	vector<string> text;
 	int x;
 	int y;
 	int _x; // pool cursor x positon when you move cursor to right or left.
 	//vector<int> charCounts;
+
+	int colorMode;
 
 	int top;
 	void renderScrollUpView(int diff);
