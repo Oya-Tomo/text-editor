@@ -75,7 +75,7 @@ string Code::getCopyText()
 		return copyText;
 	}
 	else {
-		if (this->x > this->poolingY) {
+		if (this->x > this->poolingX) {
 			return this->text[this->y].substr(this->poolingX, this->x - this->poolingX);
 		}
 		else {
@@ -287,79 +287,25 @@ void Code::setRelativeCursorPos()
 
 void Code::moveLeft()
 {
-	if (this->x == 0) {
-		if (this->y > 0) {
-			this->y--;
-			this->x = this->text[this->y].length();
-		}
-	}
-	else {
-		if (this->x == 1) {
-			this->x = 0;
-		}
-		else if ((bool)IsDBCSLeadByte(this->text[this->y][this->x - 2]) == 1) {
-			this->x -= 2;
-		}
-		else {
-			this->x--;
-		}
-	}
-	this->poolXPosition();
+	this->moveLeftWithPool();
 	this->poolPosition();
 }
 
 void Code::moveRight()
 {
-	if (this->x == this->text[this->y].length()) {
-		if (this->y < this->text.size() - 1) {
-			this->y++;
-			this->x = 0;
-			this->poolXPosition();
-		}
-	}
-	else {
-		if ((bool)IsDBCSLeadByte(this->text[this->y][this->x]) == 1) {
-			this->x += 2;
-		}
-		else {
-			this->x++;
-		}
-	}
-	this->poolXPosition();
+	this->moveRightWithPool();
 	this->poolPosition();
 }
 
 void Code::moveUp()
 {
-	if (this->y == 0) {
-		this->x = 0;
-	}
-	else {
-		this->y--;
-		if (this->_x <= this->text[this->y].length()) {
-			this->x = this->_x;
-		}
-		else {
-			this->x = this->text[this->y].length();
-		}
-	}
+	this->moveUpWithPool();
 	this->poolPosition();
 }
 
 void Code::moveDown()
 {
-	if (this->y == this->text.size() - 1) {
-		this->x = this->text[this->y].length();
-	}
-	else {
-		this->y++;
-		if (this->_x <= this->text[this->y].length()) {
-			this->x = this->_x;
-		}
-		else {
-			this->x = this->text[this->y].length();
-		}
-	}
+	this->moveDownWithPool();
 	this->poolPosition();
 }
 
@@ -525,20 +471,55 @@ void Code::pressBack()
 
 void Code::pressDelete()
 {
-	if (this->x == this->text[this->y].length()) {
-		if (this->y != this->text.size() - 1) {
-			this->text[this->y] += this->text[this->y + 1];
-			this->text.erase(this->text.begin() + this->y + 1, this->text.begin() + this->y + 2);
+	if (this->x == this->poolingX && this->y == this->poolingY) {
+		if (this->x == this->text[this->y].length()) {
+			if (this->y != this->text.size() - 1) {
+				this->text[this->y] += this->text[this->y + 1];
+				this->text.erase(this->text.begin() + this->y + 1, this->text.begin() + this->y + 2);
+			}
+		}
+		else {
+			if ((bool)IsDBCSLeadByte(this->text[this->y][this->x]) == 1) {
+				this->text[this->y].erase(this->text[this->y].begin() + this->x, this->text[this->y].begin() + this->x + 2);
+			}
+			else {
+				this->text[this->y].erase(this->text[this->y].begin() + this->x, this->text[this->y].begin() + this->x + 1);
+			}
 		}
 	}
 	else {
-		if ((bool)IsDBCSLeadByte(this->text[this->y][this->x]) == 1) {
-			this->text[this->y].erase(this->text[this->y].begin() + this->x, this->text[this->y].begin() + this->x + 2);
+		string rangeText = this->getCopyText();
+		if (this->y > this->poolingY) {
+			int x = this->x;
+			int y = this->y;
+			this->x = this->poolingX;
+			this->y = this->poolingY;
 		}
-		else {
-			this->text[this->y].erase(this->text[this->y].begin() + this->x, this->text[this->y].begin() + this->x + 1);
+		else if (this->y == this->poolingY) {
+			if (this->x > this->poolingX) {
+				int x = this->x;
+				this->x = this->poolingX;
+				this->poolingX = this->x;
+			}
+		}
+		for (int i = 0; i < rangeText.length(); i++) {
+			if (this->x == this->text[this->y].length()) {
+				if (this->y != this->text.size() - 1) {
+					this->text[this->y] += this->text[this->y + 1];
+					this->text.erase(this->text.begin() + this->y + 1, this->text.begin() + this->y + 2);
+				}
+			}
+			else {
+				if ((bool)IsDBCSLeadByte(this->text[this->y][this->x]) == 1) {
+					this->text[this->y].erase(this->text[this->y].begin() + this->x, this->text[this->y].begin() + this->x + 2);
+				}
+				else {
+					this->text[this->y].erase(this->text[this->y].begin() + this->x, this->text[this->y].begin() + this->x + 1);
+				}
+			}
 		}
 	}
+	this->poolPosition();
 }
 
 void Code::pressTab()

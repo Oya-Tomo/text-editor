@@ -64,8 +64,12 @@ const map<vector<int>, string> operationKeyList = {
 string keyBind() {
 	int c;
 	c = _getch();
-	bool shiftState = (bool)(GetKeyState(VK_SHIFT) & 0x8000);
-	bool ctrlState = (bool)(GetKeyState(VK_CONTROL) & 0x8000);
+	byte keyState[256];
+	GetKeyboardState(keyState);
+	bool shiftState = (bool)(GetAsyncKeyState(VK_SHIFT) & 0x8000);
+	bool ctrlState = (bool)(GetAsyncKeyState(VK_CONTROL) & 0x8000);
+	//bool shiftState = (keyState[VK_SHIFT] & 0x80);
+	//bool ctrlState = (keyState[VK_CONTROL] & 0x80);
 
 	vector<int> stdi;
 	stdi.push_back(c);
