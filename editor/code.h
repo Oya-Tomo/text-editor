@@ -20,7 +20,6 @@ public:
 	void renderOneLineCode();
 
 	void setColorMode(int mode);
-	string getCopyText();
 
 private:
 	vector<string> text;
@@ -56,7 +55,8 @@ private:
 	void pressDelete();
 	void pressTab();
 
-	void deleteRange();
+	string getRangeText();
+	void deleteRangeText();
 	void poolXPosition();
 	void poolPosition();
 };

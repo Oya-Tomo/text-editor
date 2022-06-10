@@ -13,6 +13,8 @@ void printPartial(int x, int y, string text);
 void setCursorPosition(int x, int y);
 void getConsoleSize(int* width, int* height);
 
+void setClipBoardText(string text);
+
 bool checkFileExists(const std::string& str);
 
 string UTF8toSjis(string srcUTF8);

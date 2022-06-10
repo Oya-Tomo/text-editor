@@ -39,51 +39,6 @@ void Code::setColorMode(int mode)
 	this->colorMode = mode;
 }
 
-string Code::getCopyText()
-{
-	if (this->x == this->poolingX && this->y == this->poolingY) {
-		return this->text[this->y];
-	}
-	else if (this->y > this->poolingY) {
-		string copyText = "";
-		for (int i = this->poolingY; i <= this->y; i++) {
-			if (i == this->poolingY) {
-				copyText += this->text[i].substr(this->poolingX, this->text[i].length() - this->poolingX) + "\r";
-			}
-			else if (i == this->y) {
-				copyText += this->text[i].substr(0, this->x);
-			}
-			else {
-				copyText += this->text[i] + "\r";
-			}
-		}
-		return copyText;
-	}
-	else if (this->y < this->poolingY) {
-		string copyText = "";
-		for (int i = this->y; i <= this->poolingY; i++) {
-			if (i == this->y) {
-				copyText += this->text[i].substr(this->x, this->text[i].length() - this->x) + "\r";
-			}
-			else if (i == this->poolingY) {
-				copyText += this->text[i].substr(0, this->poolingX);
-			}
-			else {
-				copyText += this->text[i] + "\r";
-			}
-		}
-		return copyText;
-	}
-	else {
-		if (this->x > this->poolingX) {
-			return this->text[this->y].substr(this->poolingX, this->x - this->poolingX);
-		}
-		else {
-			return this->text[this->y].substr(this->x, this->poolingX - this->x);
-		}
-	}
-}
-
 vector<int> Code::getViewSize()
 {
 	//int width = *max_element(this->charCounts.begin(), this->charCounts.end());
@@ -206,6 +161,16 @@ void Code::renderCode(string keyEvent)
 			this->pressDelete();
 			this->renderOneLineCode();
 		}
+	}
+	else if (keyEvent == "<[ctrl-c]>") {
+		setClipBoardText(this->getRangeText());
+	}
+	else if (keyEvent == "<[ctrl-x]>") {
+		setClipBoardText(this->getRangeText());
+		this->deleteRangeText();
+		this->poolPosition();
+		this->scrollView();
+		this->renderViewCode();
 	}
 	else {
 		vector<vector<string>> splitedLines = { split(keyEvent, "\r"), split(keyEvent, "\n"), split(keyEvent, "\r\n") };
@@ -468,7 +433,7 @@ void Code::pressBack()
 		}
 	}
 	else {
-		this->deleteRange();
+		this->deleteRangeText();
 	}
 	this->poolXPosition();
 	this->poolPosition();
@@ -493,7 +458,7 @@ void Code::pressDelete()
 		}
 	}
 	else {
-		this->deleteRange();
+		this->deleteRangeText();
 	}
 	this->poolXPosition();
 	this->poolPosition();
@@ -504,20 +469,84 @@ void Code::pressTab()
 	this->insertString("    ");
 }
 
-void Code::deleteRange()
+string Code::getRangeText()
 {
-	string rangeText = this->getCopyText();
-	if (this->y > this->poolingY) {
-		int x = this->x;
-		int y = this->y;
+	if (this->x == this->poolingX && this->y == this->poolingY) {
+		return this->text[this->y];
+	}
+	else if (this->y > this->poolingY) {
+		string copyText = "";
+		for (int i = this->poolingY; i <= this->y; i++) {
+			if (i == this->poolingY) {
+				copyText += this->text[i].substr(this->poolingX, this->text[i].length() - this->poolingX) + "\r";
+			}
+			else if (i == this->y) {
+				copyText += this->text[i].substr(0, this->x);
+			}
+			else {
+				copyText += this->text[i] + "\r";
+			}
+		}
+		return copyText;
+	}
+	else if (this->y < this->poolingY) {
+		string copyText = "";
+		for (int i = this->y; i <= this->poolingY; i++) {
+			if (i == this->y) {
+				copyText += this->text[i].substr(this->x, this->text[i].length() - this->x) + "\r";
+			}
+			else if (i == this->poolingY) {
+				copyText += this->text[i].substr(0, this->poolingX);
+			}
+			else {
+				copyText += this->text[i] + "\r";
+			}
+		}
+		return copyText;
+	}
+	else {
+		if (this->x > this->poolingX) {
+			return this->text[this->y].substr(this->poolingX, this->x - this->poolingX);
+		}
+		else {
+			return this->text[this->y].substr(this->x, this->poolingX - this->x);
+		}
+	}
+}
+
+void Code::deleteRangeText()
+{
+	string rangeText = this->getRangeText();
+	if (this->x == this->poolingX && this->y == this->poolingY) {
+		if (this->y != this->text.size() - 1) {
+			this->text.erase(this->text.begin() + this->y);
+			if (this->text[this->y].size() < this->x) {
+				this->x = this->text[this->y].size();
+			}
+		}
+		else {
+			if (this->y != 0) {
+				this->text.erase(this->text.begin() + this->y);
+				this->y--;
+				if (this->text[this->y].size() < this->x) {
+					this->x = this->text[this->y].size();
+				}
+			}
+			else {
+				this->text[0] = "";
+				this->x = 0;
+			}
+		}
+		this->poolXPosition();
+		this->poolPosition();
+	}
+	else if (this->y > this->poolingY) {
 		this->x = this->poolingX;
 		this->y = this->poolingY;
 	}
 	else if (this->y == this->poolingY) {
 		if (this->x > this->poolingX) {
-			int x = this->x;
 			this->x = this->poolingX;
-			this->poolingX = this->x;
 		}
 	}
 	for (int i = 0; i < rangeText.length(); i++) {

@@ -61,28 +61,6 @@ int main(int argc, char *argv[])
 			core.save(content);
 			exit(0);
 		}
-		else if (keyEvent == "<[ctrl-c]>") {
-			HWND hwnd = GetClipboardOwner();
-
-			string copyText = code.getCopyText();
-			int bufSize = copyText.size();
-			
-			HANDLE hmem = GlobalAlloc(GHND, (strlen(copyText.c_str()) + 1));
-			if (hmem) {
-				LPSTR lpMem = (LPSTR)::GlobalLock(hmem);
-				memcpy(lpMem, copyText.c_str(), (strlen(copyText.c_str()) + 1));
-				GlobalUnlock(hmem);
-				if (OpenClipboard(hwnd)) {
-					if (EmptyClipboard() && copyText != "") {
-						SetClipboardData(CF_TEXT, hmem);
-						CloseClipboard();
-					}
-				}
-				else {
-					SetConsoleTitleA("copy failed !!");
-				}
-			}
-		}
 		else {
 			code.renderCode(keyEvent);
 		}

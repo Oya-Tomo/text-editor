@@ -43,6 +43,26 @@ void getConsoleSize(int* width, int* height) {
 	*height = info.srWindow.Bottom - info.srWindow.Top + 1;
 }
 
+void setClipBoardText(string text)
+{
+	HWND hwnd = GetClipboardOwner();
+	HANDLE hmem = GlobalAlloc(GHND, (strlen(text.c_str()) + 1));
+	if (hmem) {
+		LPSTR lpMem = (LPSTR)GlobalLock(hmem);
+		memcpy(lpMem, text.c_str(), (strlen(text.c_str()) + 1));
+		GlobalUnlock(hmem);
+		if (OpenClipboard(hwnd)) {
+			if (EmptyClipboard() && text != "") {
+				SetClipboardData(CF_TEXT, hmem);
+				CloseClipboard();
+			}
+		}
+		else {
+			SetConsoleTitleA("copy failed !!");
+		}
+	}
+}
+
 bool checkFileExists(const std::string& str)
 {
 	std::ifstream ifs(str);
