@@ -20,6 +20,7 @@ public:
 	void renderOneLineCode();
 
 	void setColorMode(int mode);
+	string getCopyText();
 
 private:
 	vector<string> text;

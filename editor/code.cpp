@@ -39,6 +39,51 @@ void Code::setColorMode(int mode)
 	this->colorMode = mode;
 }
 
+string Code::getCopyText()
+{
+	if (this->x == this->poolingX && this->y == this->poolingY) {
+		return this->text[this->y];
+	}
+	else if (this->y > this->poolingY) {
+		string copyText = "";
+		for (int i = this->poolingY; i <= this->y; i++) {
+			if (i == this->poolingY) {
+				copyText += this->text[i].substr(this->poolingX, this->text[i].length() - this->poolingX) + "\r";
+			}
+			else if (i == this->y) {
+				copyText += this->text[i].substr(0, this->x);
+			}
+			else {
+				copyText += this->text[i] + "\r";
+			}
+		}
+		return copyText;
+	}
+	else if (this->y < this->poolingY) {
+		string copyText = "";
+		for (int i = this->y; i <= this->poolingY; i++) {
+			if (i == this->y) {
+				copyText += this->text[i].substr(this->x, this->text[i].length() - this->x) + "\r";
+			}
+			else if (i == this->poolingY) {
+				copyText += this->text[i].substr(0, this->poolingX);
+			}
+			else {
+				copyText += this->text[i] + "\r";
+			}
+		}
+		return copyText;
+	}
+	else {
+		if (this->x > this->poolingY) {
+			return this->text[this->y].substr(this->poolingX, this->x - this->poolingX);
+		}
+		else {
+			return this->text[this->y].substr(this->x, this->poolingX - this->x);
+		}
+	}
+}
+
 vector<int> Code::getViewSize()
 {
 	//int width = *max_element(this->charCounts.begin(), this->charCounts.end());
@@ -411,7 +456,7 @@ void Code::insertString(string content)
 		}
 	}
 	this->poolXPosition();
-
+	this->poolPosition();
 	//this->charCounts[this->y] = this->text[this->y].length();
 }
 
@@ -442,6 +487,7 @@ void Code::pressEnter()
 		//this->charCounts.insert(this->charCounts.begin() + this->y, substr.length());
 	}
 	this->poolXPosition();
+	this->poolPosition();
 }
 
 void Code::pressBack()
@@ -452,7 +498,7 @@ void Code::pressBack()
 			this->text[this->y - 1] += this->text[this->y];
 			this->text.erase(this->text.begin() + this->y, this->text.begin() + this->y + 1);
 			this->y--;
-			
+
 			//this->charCounts[this->y] = this->text[this->y].length();
 			//this->charCounts.erase(this->charCounts.begin() + this->y + 1, this->charCounts.begin() + this->y + 2);
 		}
@@ -474,6 +520,7 @@ void Code::pressBack()
 		//this->charCounts[this->y] = this->text[this->y].length();
 	}
 	this->poolXPosition();
+	this->poolPosition();
 }
 
 void Code::pressDelete()
