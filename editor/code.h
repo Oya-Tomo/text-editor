@@ -56,6 +56,7 @@ private:
 	void pressDelete();
 	void pressTab();
 
+	void deleteRange();
 	void poolXPosition();
 	void poolPosition();
 };
