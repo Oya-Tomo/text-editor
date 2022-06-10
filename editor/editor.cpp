@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
 	code.setColorMode(HTML_MODE);
 	code.setText(core.open());
 	code.renderViewCode();
+	cout << "\x1b[1;1H";
 
 	while (true)
 	{

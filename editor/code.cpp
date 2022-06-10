@@ -120,6 +120,22 @@ void Code::renderCode(string keyEvent)
 		this->scrollView();
 		this->renderViewCode();
 	}
+	else if (keyEvent == "<[shift-up]>") {
+		this->moveUpWithPool();
+		this->scrollView();
+	}
+	else if (keyEvent == "<[shift-down]>") {
+		this->moveDownWithPool();
+		this->scrollView();
+	}
+	else if (keyEvent == "<[shift-left]>") {
+		this->moveLeftWithPool();
+		this->scrollView();
+	}
+	else if (keyEvent == "<[shift-right]>") {
+		this->moveRightWithPool();
+		this->scrollView();
+	}
 	else if (keyEvent == "<[tab]>") {
 		this->pressTab();
 		this->renderOneLineCode();
@@ -135,7 +151,7 @@ void Code::renderCode(string keyEvent)
 			this->renderOneLineCode();
 		}
 	}
-	else if (keyEvent == "<[delete]>") {
+	else if (keyEvent == "<[delete]>" or keyEvent == "<[shift-delete]>") {
 		if (this->x == this->text[this->y].length()) {
 			this->pressDelete();
 			this->scrollView();
@@ -147,16 +163,18 @@ void Code::renderCode(string keyEvent)
 		}
 	}
 	else {
-		vector<string> lines = split(keyEvent, "\r");
+		vector<vector<string>> splitedLines = { split(keyEvent, "\r"), split(keyEvent, "\n"), split(keyEvent, "\r\n") };
+		vector<int> lineSize = vector<int>{(int)splitedLines[0].size(), (int)splitedLines[1].size(), (int)splitedLines[2].size()};
+		vector<int>::iterator iter = max_element(lineSize.begin(), lineSize.end());
+		int index = distance(lineSize.begin(), iter);
 
-		if (lines.size() == 1) {
+		if (splitedLines[index].size() == 1) {
 			this->insertString(keyEvent);
 			this->renderOneLineCode();
 		}
 		else {
-
-			for (int i = 0; i < lines.size(); i++) {
-				this->insertString(lines[i]);
+			for (int i = 0; i < splitedLines[index].size(); i++) {
+				this->insertString(splitedLines[index][i]);
 				if (i != i - 1) {
 					this->pressEnter();
 				}
@@ -242,6 +260,7 @@ void Code::moveLeft()
 		}
 	}
 	this->poolXPosition();
+	this->poolPosition();
 }
 
 void Code::moveRight()
@@ -262,6 +281,7 @@ void Code::moveRight()
 		}
 	}
 	this->poolXPosition();
+	this->poolPosition();
 }
 
 void Code::moveUp()
@@ -278,7 +298,7 @@ void Code::moveUp()
 			this->x = this->text[this->y].length();
 		}
 	}
-	// view area moving.
+	this->poolPosition();
 }
 
 void Code::moveDown()
@@ -295,8 +315,83 @@ void Code::moveDown()
 			this->x = this->text[this->y].length();
 		}
 	}
-	// view area moving.
+	this->poolPosition();
 }
+
+void Code::moveLeftWithPool()
+{
+	if (this->x == 0) {
+		if (this->y > 0) {
+			this->y--;
+			this->x = this->text[this->y].length();
+		}
+	}
+	else {
+		if (this->x == 1) {
+			this->x = 0;
+		}
+		else if ((bool)IsDBCSLeadByte(this->text[this->y][this->x - 2]) == 1) {
+			this->x -= 2;
+		}
+		else {
+			this->x--;
+		}
+	}
+	this->poolXPosition();
+}
+
+void Code::moveRightWithPool()
+{
+	if (this->x == this->text[this->y].length()) {
+		if (this->y < this->text.size() - 1) {
+			this->y++;
+			this->x = 0;
+			this->poolXPosition();
+		}
+	}
+	else {
+		if ((bool)IsDBCSLeadByte(this->text[this->y][this->x]) == 1) {
+			this->x += 2;
+		}
+		else {
+			this->x++;
+		}
+	}
+	this->poolXPosition();
+}
+
+void Code::moveUpWithPool()
+{
+	if (this->y == 0) {
+		this->x = 0;
+	}
+	else {
+		this->y--;
+		if (this->_x <= this->text[this->y].length()) {
+			this->x = this->_x;
+		}
+		else {
+			this->x = this->text[this->y].length();
+		}
+	}
+}
+
+void Code::moveDownWithPool()
+{
+	if (this->y == this->text.size() - 1) {
+		this->x = this->text[this->y].length();
+	}
+	else {
+		this->y++;
+		if (this->_x <= this->text[this->y].length()) {
+			this->x = this->_x;
+		}
+		else {
+			this->x = this->text[this->y].length();
+		}
+	}
+}
+
 
 void Code::insertString(string content)
 {
@@ -407,4 +502,10 @@ void Code::pressTab()
 void Code::poolXPosition()
 {
 	this->_x = this->x;
+}
+
+void Code::poolPosition()
+{
+	this->poolingX = this->x;
+	this->poolingY = this->y;
 }

@@ -28,6 +28,9 @@ private:
 	int _x; // pool cursor x positon when you move cursor to right or left.
 	//vector<int> charCounts;
 
+	int poolingX;
+	int poolingY;
+
 	int colorMode;
 
 	int top;
@@ -41,6 +44,11 @@ private:
 	void moveUp();
 	void moveDown();
 
+	void moveLeftWithPool();
+	void moveRightWithPool();
+	void moveUpWithPool();
+	void moveDownWithPool();
+
 	void insertString(string content);
 	void pressEnter();
 	void pressBack();
@@ -48,6 +56,7 @@ private:
 	void pressTab();
 
 	void poolXPosition();
+	void poolPosition();
 };
 
 #endif // !CODE_H
