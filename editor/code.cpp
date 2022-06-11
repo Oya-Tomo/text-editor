@@ -41,7 +41,6 @@ void Code::setColorMode(int mode)
 
 vector<int> Code::getViewSize()
 {
-	//int width = *max_element(this->charCounts.begin(), this->charCounts.end());
 	int width = 0;
 	int height = this->text.size();
 
@@ -59,8 +58,6 @@ void Code::renderViewCode()
 
 	if (this->top + height <= this->text.size()) {
 		for (int i = 0; i < height; i++) {
-			//std::cout << this->text[i + this->top];
-			//std::cout << std::regex_replace(this->text[i + this->top], std::regex("(</?!?)([a-z]*[A-Z]*[0-9]*)([^>]*)(>)"), "$1\033[34m$2\033[33m$3\033[m$4");
 			std::cout << coloringText(this->text[i + this->top], this->colorMode);
 			if (i != height - 1) {
 				std::cout << "\n";
@@ -70,8 +67,6 @@ void Code::renderViewCode()
 	else {
 		int lines = this->text.size() - this->top;
 		for (int i = 0; i < lines; i++) {
-			//std::cout << this->text[i + this->top];
-			//std::cout << std::regex_replace(this->text[i + this->top], std::regex("(</?!?)([a-z]*[A-Z]*[0-9]*)([^>]*)(>)"), "$1\033[34m$2\033[33m$3\033[m$4");
 			std::cout << coloringText(this->text[i + this->top], this->colorMode);
 			if (i != lines - 1) {
 				std::cout << "\n";
@@ -87,8 +82,6 @@ void Code::renderOneLineCode()
 	std::cout << "\x1b[?25l";
 	std::cout << "\x1b[" << this->y - this->top + 1 << ";0H";
 	std::cout << "\x1b[2K";
-	//std::cout << this->text[this->y];
-	//std::cout << std::regex_replace(this->text[this->y], std::regex("(</?!?)([a-z]*[A-Z]*[0-9]*)([^>]*)(>)"), "$1\033[34m$2\033[33m$3\033[m$4");
 	std::cout << coloringText(this->text[this->y], this->colorMode);
 
 	std::cout << "\x1b[?25h";
@@ -220,7 +213,6 @@ void Code::renderScrollDownView(int diff)
 	std::cout << "\x1b[" << diff << "S";
 	for (int i = 0; i < diff; i++) {
 		std::cout << "\x1b[" << height - i << ";1H";
-		//std::cout << this->text[this->top + height - 1 - i];
 		std::cout << coloringText(this->text[this->top + height - 1 - i], this->colorMode);
 	}
 	
@@ -246,7 +238,6 @@ void Code::scrollView()
 void Code::setRelativeCursorPos()
 {
 	std::cout << "\x1b[" << this->y - this->top + 1 << ";" << this->x + 1 << "H";
-	// ANSIコードの左角は(1, 1)だから+1してます。
 	std::cout << "\x1b[?25h";
 }
 
@@ -540,28 +531,30 @@ void Code::deleteRangeText()
 		this->poolXPosition();
 		this->poolPosition();
 	}
-	else if (this->y > this->poolingY) {
-		this->x = this->poolingX;
-		this->y = this->poolingY;
-	}
-	else if (this->y == this->poolingY) {
-		if (this->x > this->poolingX) {
+	else {
+		if (this->y > this->poolingY) {
 			this->x = this->poolingX;
+			this->y = this->poolingY;
 		}
-	}
-	for (int i = 0; i < rangeText.length(); i++) {
-		if (this->x == this->text[this->y].length()) {
-			if (this->y != this->text.size() - 1) {
-				this->text[this->y] += this->text[this->y + 1];
-				this->text.erase(this->text.begin() + this->y + 1, this->text.begin() + this->y + 2);
+		else if (this->y == this->poolingY) {
+			if (this->x > this->poolingX) {
+				this->x = this->poolingX;
 			}
 		}
-		else {
-			if ((bool)IsDBCSLeadByte(this->text[this->y][this->x]) == 1) {
-				this->text[this->y].erase(this->text[this->y].begin() + this->x, this->text[this->y].begin() + this->x + 2);
+		for (int i = 0; i < rangeText.length(); i++) {
+			if (this->x == this->text[this->y].length()) {
+				if (this->y != this->text.size() - 1) {
+					this->text[this->y] += this->text[this->y + 1];
+					this->text.erase(this->text.begin() + this->y + 1, this->text.begin() + this->y + 2);
+				}
 			}
 			else {
-				this->text[this->y].erase(this->text[this->y].begin() + this->x, this->text[this->y].begin() + this->x + 1);
+				if ((bool)IsDBCSLeadByte(this->text[this->y][this->x]) == 1) {
+					this->text[this->y].erase(this->text[this->y].begin() + this->x, this->text[this->y].begin() + this->x + 2);
+				}
+				else {
+					this->text[this->y].erase(this->text[this->y].begin() + this->x, this->text[this->y].begin() + this->x + 1);
+				}
 			}
 		}
 	}
