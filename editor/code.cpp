@@ -58,7 +58,11 @@ void Code::renderViewCode()
 
 	if (this->top + height <= this->text.size()) {
 		for (int i = 0; i < height; i++) {
-			std::cout << coloringText(this->text[i + this->top], this->colorMode);
+			int start = 0;
+			int end = this->text[i + this->top].size();
+
+			std::cout << coloringText(this->text[i + this->top], this->colorMode, i + this->top, this->x, this->y, this->poolingX, this->poolingY);
+			
 			if (i != height - 1) {
 				std::cout << "\n";
 			}
@@ -67,7 +71,7 @@ void Code::renderViewCode()
 	else {
 		int lines = this->text.size() - this->top;
 		for (int i = 0; i < lines; i++) {
-			std::cout << coloringText(this->text[i + this->top], this->colorMode);
+			std::cout << coloringText(this->text[i + this->top], this->colorMode, i + this->top, this->x, this->y, this->poolingX, this->poolingY);
 			if (i != lines - 1) {
 				std::cout << "\n";
 			}
@@ -82,7 +86,7 @@ void Code::renderOneLineCode()
 	std::cout << "\x1b[?25l";
 	std::cout << "\x1b[" << this->y - this->top + 1 << ";0H";
 	std::cout << "\x1b[2K";
-	std::cout << coloringText(this->text[this->y], this->colorMode);
+	std::cout << coloringText(this->text[this->y], this->colorMode, this->y, this->x, this->y, this->poolingX, this->poolingY);
 
 	std::cout << "\x1b[?25h";
 }
@@ -95,18 +99,22 @@ void Code::renderCode(string keyEvent)
 	if (keyEvent == "<[up]>") {
 		this->moveUp();
 		this->scrollView();
+		this->renderViewCode();
 	}
 	else if (keyEvent == "<[down]>") {
 		this->moveDown();
 		this->scrollView();
+		this->renderViewCode();
 	}
 	else if (keyEvent == "<[left]>") {
 		this->moveLeft();
 		this->scrollView();
+		this->renderViewCode();
 	}
 	else if (keyEvent == "<[right]>") {
 		this->moveRight();
 		this->scrollView();
+		this->renderViewCode();
 	}
 	else if (keyEvent == "<[enter]>") {
 		this->pressEnter();
@@ -116,18 +124,22 @@ void Code::renderCode(string keyEvent)
 	else if (keyEvent == "<[shift-up]>") {
 		this->moveUpWithPool();
 		this->scrollView();
+		this->renderViewCode();
 	}
 	else if (keyEvent == "<[shift-down]>") {
 		this->moveDownWithPool();
 		this->scrollView();
+		this->renderViewCode();
 	}
 	else if (keyEvent == "<[shift-left]>") {
 		this->moveLeftWithPool();
 		this->scrollView();
+		this->renderViewCode();
 	}
 	else if (keyEvent == "<[shift-right]>") {
 		this->moveRightWithPool();
 		this->scrollView();
+		this->renderViewCode();
 	}
 	else if (keyEvent == "<[tab]>") {
 		this->pressTab();
@@ -197,7 +209,7 @@ void Code::renderScrollUpView(int diff)
 	for (int i = 0; i < diff; i++) {
 		std::cout << "\x1b[" << i + 1 << ";1H";
 		//std::cout << this->text[this->top + i];
-		std::cout << coloringText(this->text[this->top + i], this->colorMode);
+		std::cout << coloringText(this->text[i + this->top], this->colorMode, i + this->top, this->x, this->y, this->poolingX, this->poolingY);
 	}
 	
 	std::cout << "\x1b[?25h";
@@ -213,7 +225,7 @@ void Code::renderScrollDownView(int diff)
 	std::cout << "\x1b[" << diff << "S";
 	for (int i = 0; i < diff; i++) {
 		std::cout << "\x1b[" << height - i << ";1H";
-		std::cout << coloringText(this->text[this->top + height - 1 - i], this->colorMode);
+		std::cout << coloringText(this->text[this->top + height - 1 - i], this->colorMode, this->top + height - 1 - i, this->x, this->y, this->poolingX, this->poolingY);
 	}
 	
 	std::cout << "\x1b[?25h";

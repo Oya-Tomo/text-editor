@@ -12,8 +12,7 @@
 
 using namespace std;
 
-string coloringText(string text, int mode);
+string coloringText(string text, int mode, int line, int x1, int y1, int x2, int y2);
 
-string coloringHtml(string text);
 
 #endif // !COLOR_H
