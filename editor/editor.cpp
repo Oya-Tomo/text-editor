@@ -30,8 +30,8 @@ int main(int argc, char *argv[])
 
 	Core core = Core(filename);
 	Code code = Code();
-	//code.setColorMode(HTML_MODE);
-	code.setColorMode(NORMAL_MODE);
+	code.setColorMode(HTML_MODE);
+	//code.setColorMode(NORMAL_MODE);
 	code.setText(core.open());
 	code.renderViewCode();
 	cout << "\x1b[1;1H";

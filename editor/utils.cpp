@@ -22,13 +22,6 @@ vector<string> split(string text, string target)
 	return lines;
 }
 
-void printPartial(int x, int y, string text)
-{
-	std::cout << "\033[?25l";
-	setCursorPosition(x, y);
-	cout << text;
-	std::cout << "\033[?25h";
-}
 
 void setCursorPosition(int x, int y) {
 	COORD pos = { x, y };
@@ -97,4 +90,41 @@ std::string SjistoUTF8(std::string srcSjis)
 	std::string strUTF8(bufUTF8);
 
 	return strUTF8;
+}
+
+vector<MatchData> extractMatchesAll(string text, regex rgx, int count)
+{
+	string target = text;
+	vector<MatchData> results;
+	int lastPos = 0;
+	count++;
+
+	while (true)
+	{
+		smatch searchResult;
+		smatch partResult;
+		string part;
+		MatchData match;
+
+		if (regex_search(target, searchResult, rgx)) {
+			part = target.substr(searchResult.position(), searchResult.length());
+
+			match.pos = lastPos + searchResult.position();
+			match.length = searchResult.length();
+
+			lastPos += searchResult.position() + searchResult.length();
+			target.erase(0, searchResult.position() + searchResult.length());
+
+			if (regex_match(part, partResult, rgx)) {
+				for (int i = 0; i < count; i++) {
+					match.data.push_back(partResult[i].str());
+				}
+				results.push_back(match);
+			}
+		}
+		else {
+			break;
+		}
+	}
+	return results;
 }

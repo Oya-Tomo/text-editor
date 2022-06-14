@@ -14,5 +14,7 @@ using namespace std;
 
 string coloringText(string text, int mode, int line, int x1, int y1, int x2, int y2);
 
+string coloringHTML(string text, int start, int end);
+
 
 #endif // !COLOR_H
