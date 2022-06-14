@@ -18,6 +18,7 @@ public:
 	void renderCode(string keyEvent);
 	void renderViewCode();
 	void renderOneLineCode();
+	void renderAroundCode();
 
 	void setColorMode(int mode);
 
@@ -30,6 +31,7 @@ private:
 
 	int poolingX;
 	int poolingY;
+	bool poolled;
 
 	int colorMode;
 

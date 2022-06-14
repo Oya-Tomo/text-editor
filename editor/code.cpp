@@ -18,6 +18,7 @@ Code::Code()
 	this->x = 0;
 	this->y = 0;
 	this->_x = 0;
+	this->poolled = false;
 	//this->charCounts = { 0 };
 	this->colorMode = NORMAL_MODE;
 
@@ -84,8 +85,27 @@ void Code::renderViewCode()
 void Code::renderOneLineCode()
 {
 	std::cout << "\x1b[?25l";
-	std::cout << "\x1b[" << this->y - this->top + 1 << ";0H";
+	std::cout << "\x1b[" << this->y - this->top + 1 << ";1H";
 	std::cout << "\x1b[2K";
+	std::cout << coloringText(this->text[this->y], this->colorMode, this->y, this->x, this->y, this->poolingX, this->poolingY);
+	std::cout << "\x1b[?25h";
+}
+
+void Code::renderAroundCode()
+{
+	int width, height;
+	getConsoleSize(&width, &height);
+
+	std::cout << "\x1b[?25l";
+	if (0 < this->y - this->top && this->y - 1 >= 0) {
+		std::cout << "\x1b[" << this->y - this->top << ";1H";
+		std::cout << coloringText(this->text[this->y - 1], this->colorMode, this->y - 1, this->x, this->y, this->poolingX, this->poolingY);
+	}
+	if (height - 1 > this->y - this->top && this->y + 1 < this->text.size()) {
+		std::cout << "\x1b[" << this->y - this->top + 2 << ";1H";
+		std::cout << coloringText(this->text[this->y + 1], this->colorMode, this->y + 1, this->x, this->y, this->poolingX, this->poolingY);
+	}
+	std::cout << "\x1b[" << this->y - this->top + 1 << ";1H";
 	std::cout << coloringText(this->text[this->y], this->colorMode, this->y, this->x, this->y, this->poolingX, this->poolingY);
 
 	std::cout << "\x1b[?25h";
@@ -99,51 +119,74 @@ void Code::renderCode(string keyEvent)
 	if (keyEvent == "<[up]>") {
 		this->moveUp();
 		this->scrollView();
-		this->renderViewCode();
+		if (this->poolled) {
+			this->renderViewCode();
+			this->poolled = false;
+		}
 	}
 	else if (keyEvent == "<[down]>") {
 		this->moveDown();
 		this->scrollView();
-		this->renderViewCode();
+		if (this->poolled) {
+			this->renderViewCode();
+			this->poolled = false;
+		}
 	}
 	else if (keyEvent == "<[left]>") {
 		this->moveLeft();
 		this->scrollView();
-		this->renderViewCode();
+		if (this->poolled) {
+			this->renderViewCode();
+			this->poolled = false;
+		}
 	}
 	else if (keyEvent == "<[right]>") {
 		this->moveRight();
 		this->scrollView();
-		this->renderViewCode();
+		if (this->poolled) {
+			this->renderViewCode();
+			this->poolled = false;
+		}
 	}
 	else if (keyEvent == "<[enter]>") {
 		this->pressEnter();
 		this->scrollView();
 		this->renderViewCode();
+		this->poolled = false;
 	}
 	else if (keyEvent == "<[shift-up]>") {
 		this->moveUpWithPool();
 		this->scrollView();
-		this->renderViewCode();
+		this->renderAroundCode();
+		this->poolled = true;
 	}
 	else if (keyEvent == "<[shift-down]>") {
 		this->moveDownWithPool();
 		this->scrollView();
-		this->renderViewCode();
+		this->renderAroundCode();
+		this->poolled = true;
 	}
 	else if (keyEvent == "<[shift-left]>") {
 		this->moveLeftWithPool();
 		this->scrollView();
-		this->renderViewCode();
+		this->renderAroundCode();
+		this->poolled = true;
 	}
 	else if (keyEvent == "<[shift-right]>") {
 		this->moveRightWithPool();
 		this->scrollView();
-		this->renderViewCode();
+		this->renderAroundCode();
+		this->poolled = true;
 	}
 	else if (keyEvent == "<[tab]>") {
 		this->pressTab();
-		this->renderOneLineCode();
+		if (this->poolled) {
+			this->renderViewCode();
+		}
+		else {
+			this->renderOneLineCode();
+		}
+		this->poolled = false;
 	}
 	else if (keyEvent == "<[back]>") {
 		if (this->x == 0) {
@@ -153,8 +196,14 @@ void Code::renderCode(string keyEvent)
 		}
 		else {
 			this->pressBack();
-			this->renderOneLineCode();
+			if (this->poolled) {
+				this->renderViewCode();
+			}
+			else {
+				this->renderOneLineCode();
+			}
 		}
+		this->poolled = false;
 	}
 	else if (keyEvent == "<[delete]>" or keyEvent == "<[shift-delete]>") {
 		if (this->x == this->text[this->y].length()) {
@@ -164,8 +213,14 @@ void Code::renderCode(string keyEvent)
 		}
 		else {
 			this->pressDelete();
-			this->renderOneLineCode();
+			if (this->poolled) {
+				this->renderViewCode();
+			}
+			else {
+				this->renderOneLineCode();
+			}
 		}
+		this->poolled = false;
 	}
 	else if (keyEvent == "<[ctrl-c]>") {
 		setClipBoardText(this->getRangeText());
@@ -185,7 +240,12 @@ void Code::renderCode(string keyEvent)
 
 		if (splitedLines[index].size() == 1) {
 			this->insertString(keyEvent);
-			this->renderOneLineCode();
+			if (this->poolled) {
+				this->renderViewCode();
+			}
+			else {
+				this->renderOneLineCode();
+			}
 		}
 		else {
 			for (int i = 0; i < splitedLines[index].size(); i++) {
@@ -197,6 +257,7 @@ void Code::renderCode(string keyEvent)
 			this->scrollView();
 			this->renderViewCode();
 		}
+		this->poolled = false;
 	}
 	this->setRelativeCursorPos();
 }
