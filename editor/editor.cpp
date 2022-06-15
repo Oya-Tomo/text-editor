@@ -3,6 +3,7 @@
 #include <string>
 #include <Shlwapi.h>
 #include <Windows.h>
+#include <regex>
 
 #include "code.h"
 #include "color.h"
@@ -30,8 +31,19 @@ int main(int argc, char *argv[])
 
 	Core core = Core(filename);
 	Code code = Code();
-	code.setColorMode(HTML_MODE);
-	//code.setColorMode(NORMAL_MODE);
+
+	smatch htmlResult;
+	smatch xmlResult;
+	if (regex_match(filename, htmlResult, regex(".*\\.html"))) {
+		code.setColorMode(HTML_MODE);
+	}
+	else if (regex_match(filename, xmlResult, regex(".*\\.xml"))) {
+		code.setColorMode(HTML_MODE);
+	}
+	else {
+		code.setColorMode(NORMAL_MODE);
+	}
+	
 	code.setText(core.open());
 	code.renderViewCode();
 	cout << "\x1b[1;1H";

@@ -3,7 +3,7 @@
 #include "color.h"
 #include "utils.h"
 
-static const regex htmlRegex1 = regex("(</?!? *)([a-z]*[A-Z]*[0-9]*)([^>]*)(>)");
+static const regex htmlRegex1 = regex("(</?!? *)(\\w*)([^>]*)(>)");
 static const regex htmlRegex2 = regex("([^ =\"]*)( *)(=)( *)(\"[\\S ]*?\")( *)");
 
 string coloringText(string text, int mode, int line, int x1, int y1, int x2, int y2)
