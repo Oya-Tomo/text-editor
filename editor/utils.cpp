@@ -48,10 +48,11 @@ void setClipBoardText(string text)
 			if (EmptyClipboard() && text != "") {
 				SetClipboardData(CF_TEXT, hmem);
 				CloseClipboard();
+				SetConsoleTitleA("Copied text !");
 			}
 		}
 		else {
-			SetConsoleTitleA("copy failed !!");
+			SetConsoleTitleA("Copy failed !!");
 		}
 	}
 }

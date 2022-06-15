@@ -47,10 +47,12 @@ int main(int argc, char *argv[])
 	code.setText(core.open());
 	code.renderViewCode();
 	cout << "\x1b[1;1H";
+	SetConsoleTitleA("Text Editor");
 
 	while (true)
 	{
 		string keyEvent = keyBind();
+		SetConsoleTitleA("Text Editor");
 		if (keyEvent == "<[ctrl-s]>") {
 			vector<string> text = code.getText();
 			string content = "";
@@ -61,6 +63,7 @@ int main(int argc, char *argv[])
 				}
 			}
 			core.save(content);
+			SetConsoleTitleA("Saved file !");
 		}
 		else if (keyEvent == "<[ctrl-q]>") {
 			vector<string> text = code.getText();
