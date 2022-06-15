@@ -116,7 +116,7 @@ void Code::renderCode(string keyEvent)
 	ostringstream lineNum;
 	lineNum << setw(4) << setfill(' ') << this->y + 1;
 
-	if (keyEvent == "<[up]>") {
+	if (keyEvent == "<[up]>" || keyEvent == "<[ctrl-k]>") {
 		this->moveUp();
 		this->scrollView();
 		if (this->poolled) {
@@ -124,7 +124,7 @@ void Code::renderCode(string keyEvent)
 			this->poolled = false;
 		}
 	}
-	else if (keyEvent == "<[down]>") {
+	else if (keyEvent == "<[down]>" || keyEvent == "<[ctrl-j]>") {
 		this->moveDown();
 		this->scrollView();
 		if (this->poolled) {
@@ -132,7 +132,7 @@ void Code::renderCode(string keyEvent)
 			this->poolled = false;
 		}
 	}
-	else if (keyEvent == "<[left]>") {
+	else if (keyEvent == "<[left]>" || keyEvent == "<[ctrl-h]>") {
 		this->moveLeft();
 		this->scrollView();
 		if (this->poolled) {
@@ -140,7 +140,7 @@ void Code::renderCode(string keyEvent)
 			this->poolled = false;
 		}
 	}
-	else if (keyEvent == "<[right]>") {
+	else if (keyEvent == "<[right]>" || keyEvent == "<[ctrl-l]>") {
 		this->moveRight();
 		this->scrollView();
 		if (this->poolled) {

@@ -102,6 +102,12 @@ string keyBind() {
 			return "<[" + operationKeyList.at(stdi);
 		}
 	}
+	else if (stdi == vector<int>({ 127 })) {
+		return "<[ctrl-h]>";
+	}
+	else if (stdi.size() == 1 && (stdi[0] > 127 || stdi[0] < 32)) {
+		return "?";
+	}
 
 	return stds;
 }

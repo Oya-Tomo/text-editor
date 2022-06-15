@@ -124,12 +124,14 @@ string coloringHTML(string text, int start, int end)
 	bool ended = false;
 
 	string htmlText = "";
+	string lastColor = "";
 	for (int i = 0; i < splitedText.size(); i++) {
 		if (splitedText[i] == "") {
 			continue;
 		}
 		else if (splitedText[i][0] == '\x1b') {
 			htmlText += splitedText[i];
+			lastColor = splitedText[i];
 			continue;
 		}
 		else if (((currentLength <= start && start <= currentLength + splitedText[i].size())
@@ -137,7 +139,7 @@ string coloringHTML(string text, int start, int end)
 			int addSize = splitedText[i].size();
 			string addText = splitedText[i];
 			addText = addText.insert(start - currentLength, "\x1b[7m");
-			addText = addText.insert(end - currentLength + 4, "\x1b[0m");
+			addText = addText.insert(end - currentLength + 4, "\x1b[0m" + lastColor);
 			htmlText += addText;
 			started = true;
 			ended = true;
@@ -151,7 +153,7 @@ string coloringHTML(string text, int start, int end)
 		}
 		else if (currentLength <= end && end <= currentLength + splitedText[i].size() && !ended) {
 			int addSize = splitedText[i].size();
-			htmlText += splitedText[i].insert(end - currentLength, "\x1b[0m");
+			htmlText += splitedText[i].insert(end - currentLength, "\x1b[0m" + lastColor);
 			ended = true;
 			currentLength += addSize;
 		}

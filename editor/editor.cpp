@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 			}
 			core.save(content);
 			system("cls");
-			exit(0);
+			break;
 		}
 		else {
 			code.renderCode(keyEvent);
