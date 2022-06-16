@@ -6,6 +6,8 @@
 #include <vector>
 #include <regex>
 
+#define CP_SJIS 932
+
 using namespace std;
 
 vector<string> split(string text, string target);
@@ -17,8 +19,8 @@ void setClipBoardText(string text);
 
 bool checkFileExists(const std::string& str);
 
-string UTF8toSjis(string srcUTF8);
-string SjistoUTF8(string srcSjis);
+string UTF8toSjis(string strUTF8);
+string SjistoUTF8(string strSjis);
 
 class MatchData {
 public:

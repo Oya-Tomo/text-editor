@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 		code.setColorMode(NORMAL_MODE);
 	}
 	
-	code.setText(core.open());
+	code.setText(UTF8toSjis(core.open()));
 	code.renderViewCode();
 	cout << "\x1b[1;1H";
 	SetConsoleTitleA("Text Editor");
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 					content += "\n";
 				}
 			}
-			core.save(content);
+			core.save(SjistoUTF8(content));
 			SetConsoleTitleA("Saved file !");
 		}
 		else if (keyEvent == "<[ctrl-q]>") {

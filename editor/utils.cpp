@@ -63,34 +63,44 @@ bool checkFileExists(const std::string& str)
 	return ifs.is_open();
 }
 
-std::string UTF8toSjis(std::string srcUTF8)
+std::string UTF8toSjis(std::string strUTF8)
 {
-	int lenghtUnicode = MultiByteToWideChar(CP_UTF8, 0, srcUTF8.c_str(), srcUTF8.size() + 1, NULL, 0);
-	wchar_t* bufUnicode = new wchar_t[lenghtUnicode];
-	MultiByteToWideChar(CP_UTF8, 0, srcUTF8.c_str(), srcUTF8.size() + 1, bufUnicode, lenghtUnicode);
-	int lengthSJis = WideCharToMultiByte(CP_THREAD_ACP, 0, bufUnicode, -1, NULL, 0, NULL, NULL);
+	const int unicodeSize = MultiByteToWideChar(CP_UTF8, 0, strUTF8.c_str(), -1, NULL, 0);
+	wchar_t* pUnicode = new wchar_t[unicodeSize];
+	MultiByteToWideChar(CP_UTF8, 0, strUTF8.c_str(), -1, pUnicode, unicodeSize);
 
-	char* bufShiftJis = new char[lengthSJis];
-	WideCharToMultiByte(CP_THREAD_ACP, 0, bufUnicode, lenghtUnicode + 1, bufShiftJis, lengthSJis, NULL, NULL);
+	const int sjisSize = WideCharToMultiByte(CP_SJIS, 0, pUnicode, -1, NULL, 0, NULL, NULL);
+	char* pSjis = new char[sjisSize];
+	WideCharToMultiByte(CP_SJIS, 0, pUnicode, -1, pSjis, sjisSize, NULL, NULL);
 
-	std::string strSJis(bufShiftJis);
+	string strSjis(pSjis);
 
-	return strSJis;
+	delete[] pSjis;
+	pSjis = NULL;
+	delete[] pUnicode;
+	pUnicode = NULL;
+
+	return strSjis;
 }
 
-std::string SjistoUTF8(std::string srcSjis)
+std::string SjistoUTF8(std::string strSjis)
 {
-	int lenghtUnicode = MultiByteToWideChar(CP_THREAD_ACP, 0, srcSjis.c_str(), srcSjis.size() + 1, NULL, 0);
-	wchar_t* bufUnicode = new wchar_t[lenghtUnicode];
-	MultiByteToWideChar(CP_THREAD_ACP, 0, srcSjis.c_str(), srcSjis.size() + 1, bufUnicode, lenghtUnicode);
-	int lengthUTF8 = WideCharToMultiByte(CP_UTF8, 0, bufUnicode, -1, NULL, 0, NULL, NULL);
+	const int unicodeSize = MultiByteToWideChar(CP_SJIS, 0, strSjis.c_str(), -1, NULL, 0);
+	wchar_t* pUnicode = new wchar_t[unicodeSize];
+	MultiByteToWideChar(CP_SJIS, 0, strSjis.c_str(), -1, pUnicode, unicodeSize);
 
-	char* bufUTF8 = new char[lengthUTF8];
-	WideCharToMultiByte(CP_UTF8, 0, bufUnicode, lenghtUnicode - 1, bufUTF8, lengthUTF8, NULL, NULL);
+	const int utf8Size = WideCharToMultiByte(CP_UTF8, 0, pUnicode, -1, NULL, 0, NULL, NULL);
+	char* pUtf8 = new char[utf8Size];
+	WideCharToMultiByte(CP_UTF8, 0, pUnicode, -1, pUtf8, utf8Size, NULL, NULL);
 
-	std::string strUTF8(bufUTF8);
+	string strUtf8(pUtf8);
 
-	return strUTF8;
+	delete[] pUtf8;
+	pUtf8 = NULL;
+	delete[] pUnicode;
+	pUnicode = NULL;
+
+	return strUtf8;
 }
 
 vector<MatchData> extractMatchesAll(string text, regex rgx, int count)
