@@ -57,6 +57,9 @@ private:
 	void pressDelete();
 	void pressTab();
 
+	void insertIndent();
+	void insertLine();
+
 	string getRangeText();
 	void deleteRangeText();
 	void poolXPosition();

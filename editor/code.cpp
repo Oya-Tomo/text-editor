@@ -232,6 +232,15 @@ void Code::renderCode(string keyEvent)
 		this->scrollView();
 		this->renderViewCode();
 	}
+	else if (keyEvent == "<[ctrl-t]>") {
+		this->insertIndent();
+		this->renderViewCode();
+	}
+	else if (keyEvent == "<[ctrl-e]>") {
+		this->insertLine();
+		this->renderViewCode();
+		this->poolled = false;
+	}
 	else {
 		vector<vector<string>> splitedLines = { split(keyEvent, "\r"), split(keyEvent, "\n"), split(keyEvent, "\r\n") };
 		vector<int> lineSize = vector<int>{(int)splitedLines[0].size(), (int)splitedLines[1].size(), (int)splitedLines[2].size()};
@@ -531,6 +540,32 @@ void Code::pressDelete()
 void Code::pressTab()
 {
 	this->insertString("    ");
+}
+
+void Code::insertIndent()
+{
+	if (this->y <= this->poolingY) {
+		for (int i = this->y; i <= this->poolingY; i++) {
+			this->text[i] = "    " + this->text[i];
+		}
+	}
+	else {
+		for (int i = this->poolingY; i <= this->y; i++) {
+			this->text[i] = "    " + this->text[i];
+		}
+	}
+	this->x += 4;
+	this->poolingX += 4;
+	this->poolXPosition();
+}
+
+void Code::insertLine()
+{
+	this->x = 0;
+	this->y++;
+	this->text.insert(this->text.begin() + this->y, "");
+	this->poolXPosition();
+	this->poolPosition();
 }
 
 string Code::getRangeText()
