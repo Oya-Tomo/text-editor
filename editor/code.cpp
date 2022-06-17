@@ -63,14 +63,12 @@ void Code::renderViewCode()
 	system("cls");
 
 	int lineCount = 0;
-	string renderLine = "";
 
 	for (int i = this->top; i < height + this->top; i++) {
 		int currentLineCount = lineCount;
 		if (i == this->text.size()) {
 			break;
 		}
-		renderLine = this->text[i];
 		if (this->text[i].size() == 0) {
 			lineCount += 1;
 		}
@@ -80,7 +78,6 @@ void Code::renderViewCode()
 				lineCount++;
 			}
 			else {
-				renderLine += " ";
 				lineCount++;
 			}
 		}
@@ -88,7 +85,7 @@ void Code::renderViewCode()
 			break;
 		}
 		cout << "\x1b[" << currentLineCount + 1 << ";1H";
-		cout << coloringText(renderLine, this->colorMode, this->y, this->x, this->y, this->poolingX, this->poolingY);
+		cout << coloringText(this->text[i], this->colorMode, i, this->x, this->y, this->poolingX, this->poolingY) + " ";
 	}
 
 	std::cout << "\x1b[?25h";
