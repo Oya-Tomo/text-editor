@@ -38,6 +38,8 @@ private:
 	int top;
 	void renderScrollUpView(int diff);
 	void renderScrollDownView(int diff);
+	int getTopIndex(int bottomIndex);
+	int getBottomIndex(int topIndex);
 	void scrollView();
 	void setRelativeCursorPos();
 
