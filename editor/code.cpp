@@ -18,7 +18,7 @@ Code::Code()
 	this->x = 0;
 	this->y = 0;
 	this->_x = 0;
-	this->poolled = false;
+	this->renderAll = false;
 	//this->charCounts = { 0 };
 	this->colorMode = NORMAL_MODE;
 
@@ -69,18 +69,8 @@ void Code::renderViewCode()
 		if (i == this->text.size()) {
 			break;
 		}
-		if (this->text[i].size() == 0) {
-			lineCount += 1;
-		}
-		else {
-			lineCount += this->text[i].size() / width;
-			if (this->text[i].size() % width > 0) {
-				lineCount++;
-			}
-			else {
-				lineCount++;
-			}
-		}
+		lineCount += this->text[i].size() / width;
+		lineCount += 1;
 		if (lineCount > height) {
 			break;
 		}
@@ -89,148 +79,162 @@ void Code::renderViewCode()
 	}
 
 	std::cout << "\x1b[?25h";
+	this->renderAll = false;
 }
 
 void Code::renderOneLineCode()
-{
-	std::cout << "\x1b[?25l";
-	std::cout << "\x1b[" << this->y - this->top + 1 << ";1H";
-	std::cout << "\x1b[2K";
-	std::cout << coloringText(this->text[this->y], this->colorMode, this->y, this->x, this->y, this->poolingX, this->poolingY);
-	std::cout << "\x1b[?25h";
-}
-
-void Code::renderAroundCode()
 {
 	int width, height;
 	getConsoleSize(&width, &height);
 
 	std::cout << "\x1b[?25l";
-	if (0 < this->y - this->top && this->y - 1 >= 0) {
-		std::cout << "\x1b[" << this->y - this->top << ";1H";
-		std::cout << coloringText(this->text[this->y - 1], this->colorMode, this->y - 1, this->x, this->y, this->poolingX, this->poolingY);
-	}
-	if (height - 1 > this->y - this->top && this->y + 1 < this->text.size()) {
-		std::cout << "\x1b[" << this->y - this->top + 2 << ";1H";
-		std::cout << coloringText(this->text[this->y + 1], this->colorMode, this->y + 1, this->x, this->y, this->poolingX, this->poolingY);
-	}
-	std::cout << "\x1b[" << this->y - this->top + 1 << ";1H";
-	std::cout << coloringText(this->text[this->y], this->colorMode, this->y, this->x, this->y, this->poolingX, this->poolingY);
+	int lineCount = 0;
+	int lines = 0;
 
+	for (int i = this->top; i < height + this->top; i++) {
+		int currentLineCount = lineCount;
+		if (i == this->text.size()) {
+			break;
+		}
+		lines = this->text[i].size() / width + 1;
+		lineCount += lines;
+		if (lineCount > height) {
+			break;
+		}
+		if (i == this->y) {
+			cout << "\x1b[" << currentLineCount + 1 << ";1H";
+			cout << "\x1b[" << lines << "M";
+			cout << "\x1b[" << lines << "L";
+			cout << coloringText(this->text[i], this->colorMode, i, this->x, this->y, this->poolingX, this->poolingY) + " ";
+			break;
+		}
+	}
+	
 	std::cout << "\x1b[?25h";
 }
 
 void Code::renderCode(string keyEvent)
 {
-	ostringstream lineNum;
-	lineNum << setw(4) << setfill(' ') << this->y + 1;
-
 	if (keyEvent == "<[up]>" || keyEvent == "<[ctrl-k]>") {
+		int oldTop = this->top;
 		this->moveUp();
 		this->scrollView();
-		/*if (this->poolled) {
+		int newTop = this->top;
+		if (this->renderAll) {
 			this->renderViewCode();
-			this->poolled = false;
-		}*/
+		}
+		else if (oldTop != newTop) {
+			this->renderScrollUpView(oldTop, newTop);
+		}
 	}
 	else if (keyEvent == "<[down]>" || keyEvent == "<[ctrl-j]>") {
+		int oldTop = this->top;
 		this->moveDown();
 		this->scrollView();
-		/*if (this->poolled) {
+		int newTop = this->top;
+		if (this->renderAll) {
 			this->renderViewCode();
-			this->poolled = false;
-		}*/
+		}
+		else if (oldTop != newTop) {
+			this->renderScrollDownView(oldTop, newTop);
+		}
 	}
 	else if (keyEvent == "<[left]>" || keyEvent == "<[ctrl-h]>") {
+		int oldTop = this->top;
 		this->moveLeft();
 		this->scrollView();
-		/*if (this->poolled) {
+		int newTop = this->top;
+		if (this->renderAll) {
 			this->renderViewCode();
-			this->poolled = false;
-		}*/
+		}
+		else if (oldTop != newTop) {
+			this->renderScrollUpView(oldTop, newTop);
+		}
 	}
 	else if (keyEvent == "<[right]>" || keyEvent == "<[ctrl-l]>") {
+		int oldTop = this->top;
 		this->moveRight();
 		this->scrollView();
-		/*if (this->poolled) {
+		int newTop = this->top;
+		if (this->renderAll) {
 			this->renderViewCode();
-			this->poolled = false;
-		}*/
+		}
+		else if (oldTop != newTop) {
+			this->renderScrollDownView(oldTop, newTop);
+		}
 	}
 	else if (keyEvent == "<[enter]>") {
 		this->pressEnter();
 		this->scrollView();
-		//this->renderViewCode();
-		//this->poolled = false;
+		this->renderViewCode();
 	}
 	else if (keyEvent == "<[shift-up]>") {
 		this->moveUpWithPool();
 		this->scrollView();
-		//this->renderAroundCode();
-		//this->poolled = true;
+		this->renderViewCode();
+		this->renderAll = true;
 	}
 	else if (keyEvent == "<[shift-down]>") {
 		this->moveDownWithPool();
 		this->scrollView();
-		//this->renderAroundCode();
-		//this->poolled = true;
+		this->renderViewCode();
+		this->renderAll = true;
 	}
 	else if (keyEvent == "<[shift-left]>") {
 		this->moveLeftWithPool();
 		this->scrollView();
-		//this->renderAroundCode();
-		//this->poolled = true;
+		this->renderOneLineCode();
+		this->renderAll = true;
 	}
 	else if (keyEvent == "<[shift-right]>") {
 		this->moveRightWithPool();
 		this->scrollView();
-		//this->renderAroundCode();
-		//this->poolled = true;
+		this->renderOneLineCode();
+		this->renderAll = true;
 	}
 	else if (keyEvent == "<[tab]>") {
 		this->pressTab();
-		/*if (this->poolled) {
+		this->scrollView();
+		if (this->renderAll) {
 			this->renderViewCode();
 		}
 		else {
 			this->renderOneLineCode();
 		}
-		this->poolled = false;*/
 	}
 	else if (keyEvent == "<[back]>") {
 		if (this->x == 0) {
 			this->pressBack();
 			this->scrollView();
-			//this->renderViewCode();
+			if (this->y != 0) {
+				this->renderViewCode();
+			}
 		}
 		else {
 			this->pressBack();
-			this->scrollView();
-			/*if (this->poolled) {
+			if (this->renderAll) {
 				this->renderViewCode();
 			}
 			else {
 				this->renderOneLineCode();
-			}*/
+			}
 		}
-		this->poolled = false;
 	}
 	else if (keyEvent == "<[delete]>" or keyEvent == "<[shift-delete]>") {
 		if (this->x == this->text[this->y].length()) {
 			this->pressDelete();
 			this->scrollView();
-			//this->renderViewCode();
+			this->renderViewCode();
 		}
 		else {
 			this->pressDelete();
-			//if (this->poolled) {
-			//	this->renderViewCode();
-			//}
-			//else {
-			//	this->renderOneLineCode();
-			//}
+			if (this->renderAll) {
+				this->renderViewCode();
+			}
+			else {
+				this->renderOneLineCode();
+			}
 		}
-		//this->poolled = false;
 	}
 	else if (keyEvent == "<[ctrl-c]>") {
 		setClipBoardText(this->getRangeText());
@@ -240,19 +244,22 @@ void Code::renderCode(string keyEvent)
 		this->deleteRangeText();
 		this->poolPosition();
 		this->scrollView();
-		//this->renderViewCode();
+		this->renderViewCode();
 	}
 	else if (keyEvent == "<[ctrl-t]>") {
 		this->insertIndent();
-		//this->renderViewCode();
+		this->renderViewCode();
+		if (this->x != this->poolingX || this->y != this->poolingY) {
+			this->renderAll = true;
+		}
 	}
 	else if (keyEvent == "<[ctrl-e]>") {
 		this->insertLine();
-		//this->renderViewCode();
-		//this->poolled = false;
+		this->renderViewCode();
 	}
 	else if (keyEvent == "<[ctrl-r]>") {
 		this->scrollView();
+		this->renderViewCode();
 	}
 	else {
 		vector<vector<string>> splitedLines = { split(keyEvent, "\r"), split(keyEvent, "\n"), split(keyEvent, "\r\n") };
@@ -263,12 +270,6 @@ void Code::renderCode(string keyEvent)
 		if (splitedLines[index].size() == 1) {
 			this->insertString(keyEvent);
 			this->scrollView();
-			/*if (this->poolled) {
-				this->renderViewCode();
-			}*/
-			/*else {
-				this->renderOneLineCode();
-			}*/
 		}
 		else {
 			for (int i = 0; i < splitedLines[index].size(); i++) {
@@ -278,43 +279,84 @@ void Code::renderCode(string keyEvent)
 				}
 			}
 			this->scrollView();
-			//this->renderViewCode();
 		}
-		this->poolled = false;
+		if (this->renderAll) {
+			this->renderViewCode();
+		}
+		else {
+			this->renderOneLineCode();
+		}
 	}
-	this->renderViewCode();
 	this->setRelativeCursorPos();
 }
 
-//void Code::renderScrollUpView(int diff)
-//{
-//	std::cout << "\x1b[?25l";
-//
-//	std::cout << "\x1b[" << diff << "T";
-//	for (int i = 0; i < diff; i++) {
-//		std::cout << "\x1b[" << i + 1 << ";1H";
-//		//std::cout << this->text[this->top + i];
-//		std::cout << coloringText(this->text[i + this->top], this->colorMode, i + this->top, this->x, this->y, this->poolingX, this->poolingY);
-//	}
-//	
-//	std::cout << "\x1b[?25h";
-//}
+void Code::renderScrollUpView(int oldTop, int newTop)
+{
+	int width, height;
+	getConsoleSize(&width, &height);
 
-//void Code::renderScrollDownView(int diff)
-//{
-//	int width, height;
-//	getConsoleSize(&width, &height);
-//
-//	std::cout << "\x1b[?25l";
-//
-//	std::cout << "\x1b[" << diff << "S";
-//	for (int i = 0; i < diff; i++) {
-//		std::cout << "\x1b[" << height - i << ";1H";
-//		std::cout << coloringText(this->text[this->top + height - 1 - i], this->colorMode, this->top + height - 1 - i, this->x, this->y, this->poolingX, this->poolingY);
-//	}
-//	
-//	std::cout << "\x1b[?25h";
-//}
+	int diff = 0;
+	for (int i = newTop; i < oldTop; i++) {
+		diff += this->text[i].size() / width;
+		diff += 1;
+	}
+	cout << "\x1b[?25l";
+	cout << "\x1b[" << diff << "T";
+
+	int lineCount = 0;
+
+	for (int i = this->top; i < height + this->top; i++) {
+		int currentLineCount = lineCount;
+		if (i == this->text.size()) {
+			break;
+		}
+		lineCount += this->text[i].size() / width;
+		lineCount += 1;
+		if (lineCount > height) {
+			break;
+		}
+		if (i < oldTop) {
+			cout << "\x1b[" << currentLineCount + 1 << ";1H";
+			cout << coloringText(this->text[i], this->colorMode, i, this->x, this->y, this->poolingX, this->poolingY) + " ";
+		}
+	}
+	
+	cout << "\x1b[?25h";
+}
+
+void Code::renderScrollDownView(int oldTop, int newTop)
+{
+	int width, height;
+	getConsoleSize(&width, &height);
+
+	int diff = 0;
+	for (int i = oldTop; i < newTop; i++) {
+		diff += this->text[i].size() / width;
+		diff += 1;
+	}
+	cout << "\x1b[?25l";
+	cout << "\x1b[" << diff << "S";
+
+	int lineCount = 0;
+
+	for (int i = this->top; i < height + this->top; i++) {
+		int currentLineCount = lineCount;
+		if (i == this->text.size()) {
+			break;
+		}
+		lineCount += this->text[i].size() / width;
+		lineCount += 1;
+		if (lineCount > height) {
+			break;
+		}
+		if (i > this->getBottomIndex(oldTop)) {
+			cout << "\x1b[" << currentLineCount + 1 << ";1H";
+			cout << coloringText(this->text[i], this->colorMode, i, this->x, this->y, this->poolingX, this->poolingY) + " ";
+		}
+	}
+	
+	cout << "\x1b[?25h";
+}
 
 int Code::getTopIndex(int bottomIndex)
 {
@@ -327,15 +369,8 @@ int Code::getTopIndex(int bottomIndex)
 		if (i < 0) {
 			break;
 		}
-		else if (this->text[i].size() == 0) {
-			lineCount += 1;
-		}
-		else {
-			lineCount += this->text[i].size() / width;
-			if (this->text[i].size() % width > 0) {
-				lineCount += 1;
-			}
-		}
+		lineCount += this->text[i].size() / width;
+		lineCount += 1;
 		if (lineCount > height) {
 			break;
 		}
@@ -355,15 +390,8 @@ int Code::getBottomIndex(int topIndex)
 		if (i >= this->text.size()) {
 			break;
 		}
-		else if (this->text[i].size() == 0) {
-			lineCount += 1;
-		}
-		else {
-			lineCount += this->text[i].size() / width;
-			if (this->text[i].size() % width > 0) {
-				lineCount += 1;
-			}
-		}
+		lineCount += this->text[i].size() / width;
+		lineCount += 1;
 		if (lineCount > height) {
 			break;
 		}
@@ -422,25 +450,79 @@ void Code::setRelativeCursorPos()
 
 void Code::moveLeft()
 {
-	this->moveLeftWithPool();
+	if (this->x == 0) {
+		if (this->y > 0) {
+			this->y--;
+			this->x = this->text[this->y].length();
+		}
+	}
+	else {
+		if (this->x == 1) {
+			this->x = 0;
+		}
+		else if ((bool)IsDBCSLeadByte(this->text[this->y][this->x - 2]) == 1) {
+			this->x -= 2;
+		}
+		else {
+			this->x--;
+		}
+	}
+	this->poolXPosition();
 	this->poolPosition();
 }
 
 void Code::moveRight()
 {
-	this->moveRightWithPool();
+	if (this->x == this->text[this->y].length()) {
+		if (this->y < this->text.size() - 1) {
+			this->y++;
+			this->x = 0;
+			this->poolXPosition();
+		}
+	}
+	else {
+		if ((bool)IsDBCSLeadByte(this->text[this->y][this->x]) == 1) {
+			this->x += 2;
+		}
+		else {
+			this->x++;
+		}
+	}
+	this->poolXPosition();
 	this->poolPosition();
 }
 
 void Code::moveUp()
 {
-	this->moveUpWithPool();
+	if (this->y == 0) {
+		this->x = 0;
+	}
+	else {
+		this->y--;
+		if (this->_x <= this->text[this->y].length()) {
+			this->x = this->_x;
+		}
+		else {
+			this->x = this->text[this->y].length();
+		}
+	}
 	this->poolPosition();
 }
 
 void Code::moveDown()
 {
-	this->moveDownWithPool();
+	if (this->y == this->text.size() - 1) {
+		this->x = this->text[this->y].length();
+	}
+	else {
+		this->y++;
+		if (this->_x <= this->text[this->y].length()) {
+			this->x = this->_x;
+		}
+		else {
+			this->x = this->text[this->y].length();
+		}
+	}
 	this->poolPosition();
 }
 
@@ -464,6 +546,7 @@ void Code::moveLeftWithPool()
 		}
 	}
 	this->poolXPosition();
+	this->renderAll = true;
 }
 
 void Code::moveRightWithPool()
@@ -484,6 +567,7 @@ void Code::moveRightWithPool()
 		}
 	}
 	this->poolXPosition();
+	this->renderAll = true;
 }
 
 void Code::moveUpWithPool()
@@ -500,6 +584,7 @@ void Code::moveUpWithPool()
 			this->x = this->text[this->y].length();
 		}
 	}
+	this->renderAll = true;
 }
 
 void Code::moveDownWithPool()
@@ -516,6 +601,7 @@ void Code::moveDownWithPool()
 			this->x = this->text[this->y].length();
 		}
 	}
+	this->renderAll = true;
 }
 
 
@@ -523,6 +609,10 @@ void Code::insertString(string content)
 {
 	string origin_txt = content;
 
+	int width, height;
+	getConsoleSize(&width, &height);
+
+	int oldLines = this->text[this->y].size() / width;
 	while (!origin_txt.empty())
 	{
 		if (IsDBCSLeadByte(origin_txt[0]) == 0) {
@@ -535,6 +625,10 @@ void Code::insertString(string content)
 			origin_txt.erase(0, 2);
 			this->x += 2;
 		}
+	}
+	int newLines = this->text[this->y].size() / width;
+	if (newLines != oldLines) {
+		this->renderAll = true;
 	}
 	this->poolXPosition();
 	this->poolPosition();
@@ -567,6 +661,7 @@ void Code::pressEnter()
 		//this->charCounts[this->y - 1] = this->text[this->y - 1].length();
 		//this->charCounts.insert(this->charCounts.begin() + this->y, substr.length());
 	}
+	this->renderAll = true;
 	this->poolXPosition();
 	this->poolPosition();
 }
@@ -581,11 +676,16 @@ void Code::pressBack()
 				this->text.erase(this->text.begin() + this->y);
 				this->y--;
 
+				this->renderAll = true;
+
 				//this->charCounts[this->y] = this->text[this->y].length();
 				//this->charCounts.erase(this->charCounts.begin() + this->y + 1);
 			}
 		}
 		else {
+			int width, height;
+			getConsoleSize(&width, &height);
+			int oldLines = this->text[this->y].size() / width;
 			if (this->x == 1) {
 				this->text[this->y].erase(0, 1);
 				this->x--;
@@ -599,6 +699,10 @@ void Code::pressBack()
 				this->x--;
 			}
 			//this->charCounts[this->y] = this->text[this->y].length();
+			int newLines = this->text[this->y].size() / width;
+			if (newLines != oldLines) {
+				this->renderAll = true;
+			}
 		}
 	}
 	else {
@@ -618,9 +722,13 @@ void Code::pressDelete()
 
 				//this->charCounts[this->y] = this->text[this->y].size();
 				//this->charCounts.erase(this->charCounts.begin() + this->y + 1);
+				this->renderAll = true;
 			}
 		}
 		else {
+			int width, height;
+			getConsoleSize(&width, &height);
+			int oldLines = this->text[this->y].size() / width;
 			if ((bool)IsDBCSLeadByte(this->text[this->y][this->x]) == 1) {
 				this->text[this->y].erase(this->text[this->y].begin() + this->x, this->text[this->y].begin() + this->x + 2);
 			}
@@ -628,6 +736,10 @@ void Code::pressDelete()
 				this->text[this->y].erase(this->text[this->y].begin() + this->x, this->text[this->y].begin() + this->x + 1);
 			}
 			//this->charCounts[this->y] = this->text[this->y].size();
+			int newLines = this->text[this->y].size() / width;
+			if (newLines != oldLines) {
+				this->renderAll = true;
+			}
 		}
 	}
 	else {
@@ -659,6 +771,7 @@ void Code::insertIndent()
 	this->x += 4;
 	this->poolingX += 4;
 	this->poolXPosition();
+	this->renderAll = true;
 }
 
 void Code::insertLine()
@@ -669,6 +782,7 @@ void Code::insertLine()
 	//this->charCounts.insert(this->charCounts.begin() + this->y, 0);
 	this->poolXPosition();
 	this->poolPosition();
+	this->renderAll = true;
 }
 
 string Code::getRangeText()
@@ -771,6 +885,7 @@ void Code::deleteRangeText()
 			}
 		}
 	}
+	this->renderAll = true;
 }
 
 void Code::poolXPosition()

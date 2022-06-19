@@ -18,7 +18,6 @@ public:
 	void renderCode(string keyEvent);
 	void renderViewCode();
 	void renderOneLineCode();
-	void renderAroundCode();
 
 	void setColorMode(int mode);
 
@@ -31,13 +30,13 @@ private:
 
 	int poolingX;
 	int poolingY;
-	bool poolled;
+	bool renderAll;
 
 	int colorMode;
 
 	int top;
-	void renderScrollUpView(int diff);
-	void renderScrollDownView(int diff);
+	void renderScrollUpView(int oldTop, int newTop);
+	void renderScrollDownView(int oldTop, int newTop);
 	int getTopIndex(int bottomIndex);
 	int getBottomIndex(int topIndex);
 	void scrollView();
