@@ -154,6 +154,9 @@
     <ClInclude Include="key.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Todo.md" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

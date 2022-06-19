@@ -52,4 +52,7 @@
       <Filter>color</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Todo.md" />
+  </ItemGroup>
 </Project>
