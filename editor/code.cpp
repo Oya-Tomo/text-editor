@@ -113,6 +113,49 @@ void Code::renderOneLineCode()
 	std::cout << "\x1b[?25h";
 }
 
+void Code::renderAroundCode()
+{
+	int width, height;
+	getConsoleSize(&width, &height);
+
+	std::cout << "\x1b[?25l";
+	int lineCount = 0;
+	int lines = 0;
+
+	for (int i = this->top; i < height + this->top; i++) {
+		int currentLineCount = lineCount;
+		if (i == this->text.size()) {
+			break;
+		}
+		lines = this->text[i].size() / width + 1;
+		lineCount += lines;
+		if (lineCount > height) {
+			break;
+		}
+		if (i == this->y - 1) {
+			cout << "\x1b[" << currentLineCount + 1 << ";1H";
+			cout << "\x1b[" << lines << "M";
+			cout << "\x1b[" << lines << "L";
+			cout << coloringText(this->text[i], this->colorMode, i, this->x, this->y, this->poolingX, this->poolingY) + " ";
+		}
+		else if (i == this->y) {
+			cout << "\x1b[" << currentLineCount + 1 << ";1H";
+			cout << "\x1b[" << lines << "M";
+			cout << "\x1b[" << lines << "L";
+			cout << coloringText(this->text[i], this->colorMode, i, this->x, this->y, this->poolingX, this->poolingY) + " ";
+		}
+		else if (i == this->y + 1) {
+			cout << "\x1b[" << currentLineCount + 1 << ";1H";
+			cout << "\x1b[" << lines << "M";
+			cout << "\x1b[" << lines << "L";
+			cout << coloringText(this->text[i], this->colorMode, i, this->x, this->y, this->poolingX, this->poolingY) + " ";
+			break;
+		}
+	}
+
+	std::cout << "\x1b[?25h";
+}
+
 void Code::renderCode(string keyEvent)
 {
 	if (keyEvent == "<[up]>" || keyEvent == "<[ctrl-k]>") {
@@ -169,27 +212,55 @@ void Code::renderCode(string keyEvent)
 		this->renderViewCode();
 	}
 	else if (keyEvent == "<[shift-up]>") {
+		int oldTop = this->top;
 		this->moveUpWithPool();
 		this->scrollView();
-		this->renderViewCode();
+		int newTop = this->top;
+		if (oldTop != newTop) {
+			this->renderViewCode();
+		}
+		else {
+			this->renderAroundCode();
+		}
 		this->renderAll = true;
 	}
 	else if (keyEvent == "<[shift-down]>") {
+		int oldTop = this->top;
 		this->moveDownWithPool();
 		this->scrollView();
-		this->renderViewCode();
+		int newTop = this->top;
+		if (oldTop != newTop) {
+			this->renderViewCode();
+		}
+		else {
+			this->renderAroundCode();
+		}
 		this->renderAll = true;
 	}
 	else if (keyEvent == "<[shift-left]>") {
+		int oldTop = this->top;
 		this->moveLeftWithPool();
 		this->scrollView();
-		this->renderOneLineCode();
+		int newTop = this->top;
+		if (oldTop != newTop) {
+			this->renderViewCode();
+		}
+		else {
+			this->renderAroundCode();
+		}
 		this->renderAll = true;
 	}
 	else if (keyEvent == "<[shift-right]>") {
+		int oldTop = this->top;
 		this->moveRightWithPool();
 		this->scrollView();
-		this->renderOneLineCode();
+		int newTop = this->top;
+		if (oldTop != newTop) {
+			this->renderViewCode();
+		}
+		else {
+			this->renderAroundCode();
+		}
 		this->renderAll = true;
 	}
 	else if (keyEvent == "<[tab]>") {
