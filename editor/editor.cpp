@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 					content += "\n";
 				}
 			}
-			core.save(content);
+			core.save(SjistoUTF8(content));
 			system("cls");
 			break;
 		}
