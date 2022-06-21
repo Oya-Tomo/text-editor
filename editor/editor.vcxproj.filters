@@ -51,6 +51,7 @@
     <ClInclude Include="color.h">
       <Filter>color</Filter>
     </ClInclude>
+    <ClInclude Include="editor.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Todo.md" />

@@ -151,6 +151,7 @@
     <ClInclude Include="code.h" />
     <ClInclude Include="color.h" />
     <ClInclude Include="core.h" />
+    <ClInclude Include="editor.h" />
     <ClInclude Include="key.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>

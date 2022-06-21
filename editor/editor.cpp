@@ -10,8 +10,11 @@
 #include "core.h"
 #include "key.h"
 #include "utils.h"
+#include "editor.h"
 
 using namespace std;
+
+static bool isCloseMode = false;
 
 int main(int argc, char *argv[])
 {
@@ -51,6 +54,20 @@ int main(int argc, char *argv[])
 
 	while (true)
 	{
+		if (isCloseMode) {
+			int status = MessageBox(NULL, TEXT("保存して終了しますか？"), TEXT("Text Editor"), MB_YESNOCANCEL | MB_ICONQUESTION);
+			switch (status)
+			{
+			case IDYES:
+				systemExit(true, code, core);
+			case IDNO:
+				systemExit(false, code, core);
+			case IDCANCEL:
+				isCloseMode = false;
+			default:
+				break;
+			}
+		}
 		string keyEvent = keyBind();
 		SetConsoleTitleA("Text Editor");
 		if (keyEvent == "<[ctrl-s]>") {
@@ -66,17 +83,7 @@ int main(int argc, char *argv[])
 			SetConsoleTitleA("Saved file !");
 		}
 		else if (keyEvent == "<[ctrl-q]>") {
-			vector<string> text = code.getText();
-			string content = "";
-			for (int i = 0; i < text.size(); i++) {
-				content += text[i];
-				if (i != text.size() - 1) {
-					content += "\n";
-				}
-			}
-			core.save(SjistoUTF8(content));
-			system("cls");
-			break;
+			isCloseMode = true;
 		}
 		else {
 			code.renderCode(keyEvent);
@@ -84,4 +91,25 @@ int main(int argc, char *argv[])
 	}
 
 	return 0;
+}
+
+void systemExit(bool save, Code code, Core core)
+{
+	if (save) {
+		vector<string> text = code.getText();
+		string content = "";
+		for (int i = 0; i < text.size(); i++) {
+			content += text[i];
+			if (i != text.size() - 1) {
+				content += "\n";
+			}
+		}
+		core.save(SjistoUTF8(content));
+		system("cls");
+		exit(0);
+	}
+	else {
+		system("cls");
+		exit(0);
+	}
 }
