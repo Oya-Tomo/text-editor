@@ -277,7 +277,7 @@ void Code::renderCode(string keyEvent)
 		if (this->x == 0) {
 			this->pressBack();
 			this->scrollView();
-			if (this->y != 0) {
+			if (this->renderAll) {
 				this->renderViewCode();
 			}
 		}
@@ -295,7 +295,9 @@ void Code::renderCode(string keyEvent)
 		if (this->x == this->text[this->y].length()) {
 			this->pressDelete();
 			this->scrollView();
-			this->renderViewCode();
+			if (this->renderAll) {
+				this->renderViewCode();
+			}
 		}
 		else {
 			this->pressDelete();
@@ -332,25 +334,33 @@ void Code::renderCode(string keyEvent)
 		this->scrollView();
 		this->renderViewCode();
 	}
-	else {
-		vector<vector<string>> splitedLines = { split(keyEvent, "\r"), split(keyEvent, "\n"), split(keyEvent, "\r\n") };
-		vector<int> lineSize = vector<int>{(int)splitedLines[0].size(), (int)splitedLines[1].size(), (int)splitedLines[2].size()};
-		vector<int>::iterator iter = max_element(lineSize.begin(), lineSize.end());
-		int index = distance(lineSize.begin(), iter);
+	else if (keyEvent == "<[ctrl-v]>") {
+		vector<string> pasteLines = split(getClipBoardText(), "\r");
 
-		if (splitedLines[index].size() == 1) {
-			this->insertString(keyEvent);
-			this->scrollView();
+		for (int i = 0; i < pasteLines.size(); i++) {
+			this->insertString(pasteLines[i]);
+			if (i != pasteLines.size() - 1) {
+				this->pressEnter();
+			}
+		}
+		this->scrollView();
+		if (this->renderAll) {
+			this->renderViewCode();
 		}
 		else {
-			for (int i = 0; i < splitedLines[index].size(); i++) {
-				this->insertString(splitedLines[index][i]);
-				if (i != i - 1) {
-					this->pressEnter();
-				}
-			}
-			this->scrollView();
+			this->renderOneLineCode();
 		}
+	}
+	else {
+		vector<string> insertText = split(keyEvent, "\r");
+
+		for (int i = 0; i < insertText.size(); i++) {
+			this->insertString(insertText[i]);
+			if (i != insertText.size() - 1) {
+				this->pressEnter();
+			}
+		}
+		this->scrollView();
 		if (this->renderAll) {
 			this->renderViewCode();
 		}
