@@ -57,6 +57,29 @@ void setClipBoardText(string text)
 	}
 }
 
+string getClipBoardText()
+{
+	HWND hwnd = GetClipboardOwner();
+	if (!OpenClipboard(hwnd)) {
+		SetConsoleTitleA("Copy failed !!");
+		return "";
+	}
+	HANDLE hData = GetClipboardData(CF_TEXT);
+	if (hData == nullptr) {
+		SetConsoleTitleA("Copy failed !!");
+		return "";
+	}
+	char* pszText = static_cast<char*>(GlobalLock(hData));
+	if (pszText == nullptr) {
+		SetConsoleTitleA("Copy failed !!");
+		return "";
+	}
+	string text(pszText);
+	GlobalUnlock(hData);
+	CloseClipboard();
+	return text;
+}
+
 bool checkFileExists(const std::string& str)
 {
 	std::ifstream ifs(str);

@@ -16,6 +16,7 @@ void setCursorPosition(int x, int y);
 void getConsoleSize(int* width, int* height);
 
 void setClipBoardText(string text);
+string getClipBoardText();
 
 bool checkFileExists(const std::string& str);
 
