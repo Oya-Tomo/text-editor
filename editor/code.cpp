@@ -12,6 +12,9 @@
 
 using namespace std;
 
+static int width;
+static int height;
+
 Code::Code()
 {
 	this->text = vector<string>({ "" });
@@ -23,6 +26,8 @@ Code::Code()
 	this->colorMode = NORMAL_MODE;
 
 	this->top = 0;
+
+	getConsoleSize(&width, &height);
 }
 
 void Code::setText(string content)
@@ -46,19 +51,8 @@ void Code::setColorMode(int mode)
 	this->colorMode = mode;
 }
 
-vector<int> Code::getViewSize()
-{
-	int width = 0;
-	int height = this->text.size();
-
-	return vector<int>{width, height};
-}
-
 void Code::renderViewCode()
 {
-	int width, height;
-	getConsoleSize(&width, &height);
-
 	std::cout << "\x1b[?25l";
 	system("cls");
 
@@ -84,9 +78,6 @@ void Code::renderViewCode()
 
 void Code::renderOneLineCode()
 {
-	int width, height;
-	getConsoleSize(&width, &height);
-
 	std::cout << "\x1b[?25l";
 	int lineCount = 0;
 	int lines = 0;
@@ -115,9 +106,6 @@ void Code::renderOneLineCode()
 
 void Code::renderAroundCode()
 {
-	int width, height;
-	getConsoleSize(&width, &height);
-
 	std::cout << "\x1b[?25l";
 	int lineCount = 0;
 	int lines = 0;
@@ -158,6 +146,8 @@ void Code::renderAroundCode()
 
 void Code::renderCode(string keyEvent)
 {
+	getConsoleSize(&width, &height);
+
 	if (keyEvent == "<[up]>" || keyEvent == "<[ctrl-k]>") {
 		int oldTop = this->top;
 		this->moveUp();
@@ -373,9 +363,6 @@ void Code::renderCode(string keyEvent)
 
 void Code::renderScrollUpView(int oldTop, int newTop)
 {
-	int width, height;
-	getConsoleSize(&width, &height);
-
 	int diff = 0;
 	for (int i = newTop; i < oldTop; i++) {
 		diff += this->text[i].size() / width;
@@ -407,9 +394,6 @@ void Code::renderScrollUpView(int oldTop, int newTop)
 
 void Code::renderScrollDownView(int oldTop, int newTop)
 {
-	int width, height;
-	getConsoleSize(&width, &height);
-
 	int diff = 0;
 	for (int i = oldTop; i < newTop; i++) {
 		diff += this->text[i].size() / width;
@@ -441,9 +425,6 @@ void Code::renderScrollDownView(int oldTop, int newTop)
 
 int Code::getTopIndex(int bottomIndex)
 {
-	int width, height;
-	getConsoleSize(&width, &height);
-
 	int lineCount = 0;
 	int lastIndex = 0;
 	for (int i = bottomIndex; i > bottomIndex - height; i--) {
@@ -462,9 +443,6 @@ int Code::getTopIndex(int bottomIndex)
 
 int Code::getBottomIndex(int topIndex)
 {
-	int width, height;
-	getConsoleSize(&width, &height);
-
 	int lineCount = 0;
 	int lastIndex = 0;
 	for (int i = topIndex; i < height + topIndex; i++) {
@@ -483,8 +461,6 @@ int Code::getBottomIndex(int topIndex)
 
 void Code::scrollView()
 {
-	int width, height;
-	getConsoleSize(&width, &height);
 	int oldTop = this->top;
 
 	if (this->top > this->y) {
@@ -498,9 +474,6 @@ void Code::scrollView()
 void Code::setRelativeCursorPos()
 {
 	//std::cout << "\x1b[" << this->y - this->top + 1 << ";" << this->x + 1 << "H";
-
-	int width, height;
-	getConsoleSize(&width, &height);
 
 	int column = 0;
 	int lineCount = 0;
@@ -690,9 +663,6 @@ void Code::insertString(string content)
 {
 	string origin_txt = content;
 
-	int width, height;
-	getConsoleSize(&width, &height);
-
 	int oldLines = this->text[this->y].size() / width;
 	while (!origin_txt.empty())
 	{
@@ -764,8 +734,6 @@ void Code::pressBack()
 			}
 		}
 		else {
-			int width, height;
-			getConsoleSize(&width, &height);
 			int oldLines = this->text[this->y].size() / width;
 			if (this->x == 1) {
 				this->text[this->y].erase(0, 1);
@@ -807,8 +775,6 @@ void Code::pressDelete()
 			}
 		}
 		else {
-			int width, height;
-			getConsoleSize(&width, &height);
 			int oldLines = this->text[this->y].size() / width;
 			if ((bool)IsDBCSLeadByte(this->text[this->y][this->x]) == 1) {
 				this->text[this->y].erase(this->text[this->y].begin() + this->x, this->text[this->y].begin() + this->x + 2);

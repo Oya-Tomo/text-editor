@@ -13,7 +13,6 @@ public:
 	Code();
 	void setText(string content);
 	vector<string> getText();
-	vector<int> getViewSize();
 
 	void renderCode(string keyEvent);
 	void renderViewCode();
