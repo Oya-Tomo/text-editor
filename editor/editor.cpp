@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 	while (true)
 	{
 		if (isCloseMode) {
-			int status = MessageBox(GetConsoleWindow(), TEXT("保存して終了しますか？"), TEXT("Text Editor"), MB_YESNOCANCEL | MB_ICONQUESTION | MB_TOPMOST);
+			int status = MessageBox(GetConsoleWindow(), TEXT("保存して終了しますか？"), TEXT("Text Editor"), MB_YESNOCANCEL | MB_ICONQUESTION | MB_SYSTEMMODAL);
 			switch (status)
 			{
 			case IDYES:
